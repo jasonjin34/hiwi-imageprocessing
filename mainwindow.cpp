@@ -38,7 +38,7 @@ void MainWindow::on_search_file()
     m_scene_orig.clear();
     m_scene_res.clear();
 
-    QString filename = QFileDialog::getOpenFileName(this, "Open Image", "C:/HIWI", "Images (*.png *.jpg *.bmp)");
+    QString filename = QFileDialog::getOpenFileName(this, "Open Image", "C:/HIWI/images/backscatter", "Images (*.png *.jpg *.bmp)");
     if(!filename.isEmpty()) {        
         cv::Mat in = cv::imread(filename.toStdString(), 1);
         cv::cvtColor(in, m_image,cv::COLOR_BGR2GRAY);

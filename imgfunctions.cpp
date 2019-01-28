@@ -1,4 +1,5 @@
 #include "imgfunctions.h"
+#include <QDebug>
 
 namespace iaw
 {
@@ -25,7 +26,10 @@ void noise_median(cv::Mat& input, cv::Mat& output)
 
 void noise_bilateral(cv::Mat& input, cv::Mat& output)
 {
-    cv::bilateralFilter(input,output,15,80,80,cv::BORDER_DEFAULT);
+    cv::Mat temp;
+    cv::bilateralFilter(input,temp,15,80,80,cv::BORDER_DEFAULT);
+    output = temp;
+
 }
 
 void threshold_simple(cv::Mat& input, cv::Mat& output)
