@@ -11,7 +11,8 @@ void noise_blur(cv::Mat& input, cv::Mat& output, int w, int h)
 
 void noise_average(cv::Mat& input, cv::Mat& output)
 {
-    cv::boxFilter(input,output,input.depth(),cv::Size(3,3));
+    cv::fastNlMeansDenoising(input,output);
+    //cv::boxFilter(input,output,input.depth(),cv::Size(5,5));
 }
 
 void noise_gauss(cv::Mat& input, cv::Mat& output)
@@ -34,7 +35,7 @@ void noise_bilateral(cv::Mat& input, cv::Mat& output)
 
 void threshold_simple(cv::Mat& input, cv::Mat& output)
 {
-    // TODO
+    cv::threshold(input,output,150,255,0);
 }
 
 void threshold_adaptive_mean(cv::Mat& input, cv::Mat& output)
