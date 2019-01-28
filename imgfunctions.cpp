@@ -10,22 +10,22 @@ void noise_blur(cv::Mat& input, cv::Mat& output, int w, int h)
 
 void noise_average(cv::Mat& input, cv::Mat& output)
 {
-    // TODO
+    cv::boxFilter(input,output,input.depth(),cv::Size(3,3));
 }
 
 void noise_gauss(cv::Mat& input, cv::Mat& output)
 {
-    // TODO
+    cv::GaussianBlur(input,output,cv::Size(5,5),0,0,cv::BORDER_DEFAULT);
 }
 
 void noise_median(cv::Mat& input, cv::Mat& output)
 {
-    // TODO
+    cv::medianBlur(input,output, 5);
 }
 
 void noise_bilateral(cv::Mat& input, cv::Mat& output)
 {
-    // TODO
+    cv::bilateralFilter(input,output,15,80,80,cv::BORDER_DEFAULT);
 }
 
 void threshold_simple(cv::Mat& input, cv::Mat& output)
