@@ -104,6 +104,13 @@
           </widget>
          </item>
          <item>
+          <widget class="QRadioButton" name="optNoiseFastNImean">
+           <property name="text">
+            <string>Fast NI Mean</string>
+           </property>
+          </widget>
+         </item>
+         <item>
           <spacer name="verticalSpacer">
            <property name="orientation">
             <enum>Qt::Vertical</enum>
@@ -206,6 +213,13 @@
           <widget class="QRadioButton" name="optHisMatching">
            <property name="text">
             <string>Matching</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="referenceImageFile">
+           <property name="text">
+            <string>Add Reference Image</string>
            </property>
           </widget>
          </item>

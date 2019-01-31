@@ -30,6 +30,8 @@ class MainWindow : public QMainWindow
     QGraphicsView   m_view;
     cv::Mat         m_image;
     cv::Mat         m_result;
+    cv::Mat         m_refer; //reference image for hisMatch
+
 
 public:
     explicit MainWindow(QWidget *parent = nullptr);
@@ -38,6 +40,9 @@ public:
 public slots:
     void on_button();
     void on_search_file();
+
+private slots:
+    void on_referenceImageFile_clicked();
 
 private:
     void transform();

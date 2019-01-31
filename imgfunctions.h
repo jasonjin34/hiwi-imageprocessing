@@ -18,6 +18,8 @@ void noise_median(cv::Mat& input, cv::Mat& output);
 
 void noise_bilateral(cv::Mat& input, cv::Mat& output);
 
+void noise_fastNImeansDenoising(cv::Mat& input, cv::Mat& output);
+
 void threshold_simple(cv::Mat& input, cv::Mat& output);
 
 void threshold_adaptive_mean(cv::Mat& input, cv::Mat& output);

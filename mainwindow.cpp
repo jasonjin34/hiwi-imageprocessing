@@ -15,6 +15,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(ui->searchImage, SIGNAL(clicked()), this, SLOT(on_search_file()));
     connect(ui->btnTransform, SIGNAL(clicked()), this, SLOT(on_button()));
+    connect(ui->referenceImageFile,SIGNAL(clicked()),this,SLOT(on_referenceImageFile_clicked()));
 }
 
 
@@ -50,6 +51,19 @@ void MainWindow::on_search_file()
         }
     }
 }
+void MainWindow::on_referenceImageFile_clicked()
+{
+    m_refer = cv::Mat();
+    QString filename = QFileDialog::getOpenFileName(this, "Open Image", "C:/HIWI/images/backscatter", "Images (*.png *.jpg *.bmp)");
+    if(!filename.isEmpty()) {
+        cv::Mat in = cv::imread(filename.toStdString(), 1);
+        cv::cvtColor(in, m_refer,cv::COLOR_BGR2GRAY);
+        if(!m_refer.empty()) {
+        } else {
+            QMessageBox::critical(this, "Image Loading Error", "cannot load the image " + filename);
+        }
+    }
+}
 
 void MainWindow::transform()
 {
@@ -67,17 +81,19 @@ void MainWindow::transform()
             iaw::noise_median(m_result, m_result);
         } else if(ui->optNoiseBilateral->isChecked()) {
             iaw::noise_bilateral(m_result, m_result);
+        } else if(ui->optNoiseFastNImean->isChecked()){
+            iaw::noise_fastNImeansDenoising(m_result,m_result);
         }
     }
 
     if(!ui->optThreshold->isChecked()) {
         if(ui->optThresSimple->isChecked()) {
             iaw::threshold_simple(m_result, m_result);
-        } else if(ui->optThresSimple->isChecked()) {
-            iaw::threshold_adaptive_mean(m_result, m_result);
         } else if(ui->optThresAdaptiveMean->isChecked()) {
-            iaw::threshold_adaptive_gauss(m_result, m_result);
+            iaw::threshold_adaptive_mean(m_result, m_result);
         } else if(ui->optThresAdaptiveGaus->isChecked()) {
+            iaw::threshold_adaptive_gauss(m_result, m_result);
+        } else if(ui->optThresOtsu->isChecked()) {
             iaw::threshold_otsu(m_result, m_result);
         }
     }
@@ -108,3 +124,4 @@ void MainWindow::transform()
 
     m_scene_res.addPixmap(QPixmap::fromImage(Mat2QImageGrayscale(m_result)));
 }
+

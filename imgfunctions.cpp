@@ -11,8 +11,7 @@ void noise_blur(cv::Mat& input, cv::Mat& output, int w, int h)
 
 void noise_average(cv::Mat& input, cv::Mat& output)
 {
-    cv::fastNlMeansDenoising(input,output);
-    //cv::boxFilter(input,output,input.depth(),cv::Size(5,5));
+    cv::boxFilter(input,output,input.depth(),cv::Size(5,5));
 }
 
 void noise_gauss(cv::Mat& input, cv::Mat& output)
@@ -30,27 +29,31 @@ void noise_bilateral(cv::Mat& input, cv::Mat& output)
     cv::Mat temp;
     cv::bilateralFilter(input,temp,15,80,80,cv::BORDER_DEFAULT);
     output = temp;
+}
 
+void noise_fastNImeansDenoising(cv::Mat& input, cv::Mat& output)
+{
+    cv::fastNlMeansDenoising(input,output,10,7,21);
 }
 
 void threshold_simple(cv::Mat& input, cv::Mat& output)
 {
-    cv::threshold(input,output,150,255,0);
+    cv::threshold(input,output,170,255,0);
 }
 
 void threshold_adaptive_mean(cv::Mat& input, cv::Mat& output)
 {
-    // TODO
+    cv::adaptiveThreshold(input,output,255,cv::ADAPTIVE_THRESH_MEAN_C,cv::THRESH_BINARY,13,2);
 }
 
 void threshold_adaptive_gauss(cv::Mat& input, cv::Mat& output)
 {
-    // TODO
+    cv::adaptiveThreshold(input,output,255,cv::ADAPTIVE_THRESH_GAUSSIAN_C,cv::THRESH_BINARY,13,2);
 }
 
 void threshold_otsu(cv::Mat& input, cv::Mat& output)
 {
-    // TODO
+    cv::threshold(input,output,170,255,cv::THRESH_OTSU);
 }
 
 void histEqual(cv::Mat& input, cv::Mat& output)
@@ -66,7 +69,46 @@ void histClahe(cv::Mat& input, cv::Mat& output)
 
 void histMathing(cv::Mat& input, cv::Mat& output)
 {
-    //TODO
+    int histogram[256];
+    for(int i = 0; i < 255;i++){
+       histogram[i] = 0;
+    }
+    // calculate the no of pixels for each intensity values
+    for(int y = 0; y < input.rows; y++)
+        for(int x = 0; x < input.cols; x++)
+            histogram[(int)input.at<uchar>(y,x)]++;
+
+    for(int i = 0; i < 256; i++)
+        std::cout<<histogram[i]<<" ";
+
+    // draw the histograms
+    int hist_w = 512; int hist_h = 400;
+    int bin_w = cvRound((double) hist_w/256);
+
+    cv::Mat histImage(hist_h, hist_w, CV_8UC1, cv::Scalar(255, 255, 255));
+
+    // find the maximum intensity element from histogram
+    int max = histogram[0];
+    for(int i = 1; i < 256; i++){
+        if(max < histogram[i]){
+            max = histogram[i];
+        }
+    }
+
+    for(int i = 0; i < 255; i++){
+        histogram[i] = (((double)histogram[i]/max)*histImage.rows);
+    }
+
+    // draw the intensity line for histogram
+    for(int i = 0; i < 255; i++)
+    {
+        line(histImage,
+             cv::Point(bin_w*(i), hist_h),
+             cv::Point(bin_w*(i), hist_h - histogram[i]),
+             cv::Scalar(0,0,0), 1, 8, 0);
+    }
+    cv::imshow("test histogram", histImage);
+
 }
 
 void cannyEdge(cv::Mat& input, cv::Mat &output, int min, bool merge)
