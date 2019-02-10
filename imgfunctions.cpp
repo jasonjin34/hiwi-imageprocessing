@@ -67,48 +67,35 @@ void histClahe(cv::Mat& input, cv::Mat& output)
     clahe->apply(input, output);
 }
 
-void histMathing(cv::Mat& input, cv::Mat& output)
+void histMathing(cv::Mat& input, cv::Mat& output) //only histogram graph drawing, histMathing need two color pics
 {
-    int histogram[256];
-    for(int i = 0; i < 255;i++){
-       histogram[i] = 0;
-    }
-    // calculate the no of pixels for each intensity values
-    for(int y = 0; y < input.rows; y++)
-        for(int x = 0; x < input.cols; x++)
-            histogram[(int)input.at<uchar>(y,x)]++;
+    cv::Mat hist;
 
-    for(int i = 0; i < 256; i++)
-        std::cout<<histogram[i]<<" ";
+    int histSize = 256;
+    float range[] = {0, 256};
+    const int channels[] = {0};
+    const float* histRange = { range };
+    cv::calcHist(&input,1,channels,cv::Mat(),hist,1,&histSize,&histRange,true,true);
 
-    // draw the histograms
-    int hist_w = 512; int hist_h = 400;
-    int bin_w = cvRound((double) hist_w/256);
+    int bin_w = cvRound(static_cast<double>(600/histSize));
 
-    cv::Mat histImage(hist_h, hist_w, CV_8UC1, cv::Scalar(255, 255, 255));
+    cv::Mat histImage(500,600,CV_8UC1, cv::Scalar(255)); //para high, width, type
+    cv::normalize(hist,hist,0,hist.rows,cv::NORM_MINMAX,-1,cv::Mat());
 
-    // find the maximum intensity element from histogram
-    int max = histogram[0];
-    for(int i = 1; i < 256; i++){
-        if(max < histogram[i]){
-            max = histogram[i];
-        }
-    }
-
-    for(int i = 0; i < 255; i++){
-        histogram[i] = (((double)histogram[i]/max)*histImage.rows);
-    }
-
-    // draw the intensity line for histogram
-    for(int i = 0; i < 255; i++)
+    for( int i = 1; i < histSize; i++ )
     {
-        line(histImage,
-             cv::Point(bin_w*(i), hist_h),
-             cv::Point(bin_w*(i), hist_h - histogram[i]),
-             cv::Scalar(0,0,0), 1, 8, 0);
+        cv::line( histImage,
+                  cv::Point(bin_w*(i-1), 500 - cvRound(hist.at<float>(i-1))) ,
+                  cv::Point(bin_w*(i-1), 500),
+                  cv::Scalar(0), 2, 8, 0  );
     }
-    cv::imshow("test histogram", histImage);
+    // draw frame
+    cv::line(histImage, cv::Point(0,0), cv::Point(600,0),cv::Scalar(0),1,8,0);
+    cv::line(histImage, cv::Point(0,0), cv::Point(0,500),cv::Scalar(0),1,8,0);
+    cv::line(histImage, cv::Point(599,0), cv::Point(599,500),cv::Scalar(0),1,8,0);
+    cv::line(histImage, cv::Point(0,499), cv::Point(599,499),cv::Scalar(0),1,8,0);
 
+    output = histImage;
 }
 
 void cannyEdge(cv::Mat& input, cv::Mat &output, int min, bool merge)

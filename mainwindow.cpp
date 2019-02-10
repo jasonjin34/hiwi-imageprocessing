@@ -100,7 +100,6 @@ void MainWindow::transform()
 
     if(!ui->optHistogram->isChecked()) {
         if(ui->optHisEqual->isChecked()) {
-            qDebug() << "equal";
             iaw::histEqual(m_result, m_result);
         } else if(ui->optHisMatching->isChecked()) {
             iaw::histMathing(m_result, m_result);
