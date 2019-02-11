@@ -2,12 +2,12 @@
 #include "ui_mainwindow.h"
 #include "convfunktion.h"
 #include <QCoreApplication>
-
 #include <QFileDialog>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow)
+    ui(new Ui::MainWindow),
+    hismatchinggui(nullptr)
 {   
     ui->setupUi(this);
     ui->viewOriginal->setScene(&m_scene_orig);
@@ -65,6 +65,10 @@ void MainWindow::on_referenceImageFile_clicked()
     }
 }
 
+void MainWindow::onMessageSent(int message){
+
+}
+
 void MainWindow::transform()
 {
     m_scene_res.clear();
@@ -102,7 +106,14 @@ void MainWindow::transform()
         if(ui->optHisEqual->isChecked()) {
             iaw::histEqual(m_result, m_result);
         } else if(ui->optHisMatching->isChecked()) {
-            iaw::histMathing(m_result, m_result);
+            if(!hismatchinggui)
+            {
+                hismatchinggui = new window_histmatching(this);
+
+                connect(hismatchinggui, &window_histmatching::notifyMessageSent,this,&MainWindow::onMessageSent);
+            }
+            hismatchinggui->show();
+            iaw::histMathing(m_result, m_result,hismatchinggui);
         } else if(ui->optHisClahe->isChecked()) {
             iaw::histClahe(m_result, m_result);
         } else if(ui->optHistogramDraw->isChecked()){

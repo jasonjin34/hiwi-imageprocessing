@@ -39,16 +39,19 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
     histogram.cpp \
-    imgfunctions.cpp
+    imgfunctions.cpp \
+    window_histmatching.cpp
 
 HEADERS += \
         mainwindow.h \
     histogram.h \
     convfunktion.h \
-    imgfunctions.h
+    imgfunctions.h \
+    window_histmatching.h
 
 FORMS += \
-        mainwindow.ui
+        mainwindow.ui \
+    window_histmatching.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

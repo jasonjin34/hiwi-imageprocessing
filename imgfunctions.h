@@ -4,6 +4,7 @@
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/types_c.h>
+#include <window_histmatching.h>
 
 namespace iaw
 {
@@ -30,12 +31,18 @@ void threshold_otsu(cv::Mat& input, cv::Mat& output);
 
 void histEqual(cv::Mat& input, cv::Mat& output);
 
-void histMathing(cv::Mat& input, cv::Mat& output);
+void histEqual_leveladj(cv::Mat& input,cv::Mat& output, int min, int max);
+
+void histMathing(cv::Mat& input, cv::Mat& output, window_histmatching* gui);
 
 void histDraw(cv::Mat& input,cv::Mat& output);
 
 void histClahe(cv::Mat& input, cv::Mat& output);
 
 void cannyEdge(cv::Mat& input, cv::Mat& output, int min, bool merge);
+
+void imageHist(cv::Mat input, int histogram[]);
+
+void cumhist(int hist[], int cumhist[]);
 
 }
