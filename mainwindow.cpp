@@ -104,8 +104,9 @@ void MainWindow::transform()
         } else if(ui->optHisMatching->isChecked()) {
             iaw::histMathing(m_result, m_result);
         } else if(ui->optHisClahe->isChecked()) {
-            qDebug() << "clahe";
             iaw::histClahe(m_result, m_result);
+        } else if(ui->optHistogramDraw->isChecked()){
+            iaw::histDraw(m_result,m_result);
         }
     }
 

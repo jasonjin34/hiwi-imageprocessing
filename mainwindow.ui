@@ -224,6 +224,13 @@
           </widget>
          </item>
          <item>
+          <widget class="QRadioButton" name="optHistogramDraw">
+           <property name="text">
+            <string>Histogram </string>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="QRadioButton" name="optHisClahe">
            <property name="text">
             <string>Clahe</string>

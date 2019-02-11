@@ -67,8 +67,12 @@ void histClahe(cv::Mat& input, cv::Mat& output)
     clahe->apply(input, output);
 }
 
-void histMathing(cv::Mat& input, cv::Mat& output) //only histogram graph drawing, histMathing need two color pics
+void histMathing(cv::Mat& input, cv::Mat& output) // need color image!
 {
+
+}
+
+void histDraw(cv::Mat& input, cv::Mat& output){
     cv::Mat hist;
 
     int histSize = 256;

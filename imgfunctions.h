@@ -32,6 +32,8 @@ void histEqual(cv::Mat& input, cv::Mat& output);
 
 void histMathing(cv::Mat& input, cv::Mat& output);
 
+void histDraw(cv::Mat& input,cv::Mat& output);
+
 void histClahe(cv::Mat& input, cv::Mat& output);
 
 void cannyEdge(cv::Mat& input, cv::Mat& output, int min, bool merge);
