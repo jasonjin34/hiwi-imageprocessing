@@ -112,40 +112,53 @@ void histEqual(cv::Mat& input, cv::Mat& output)
 }
 
 //histogram equalization for level adjustment gui
-void histEqual_leveladj(cv::Mat& input,cv::Mat& output, int min, int max)
+void histEqual_leveladj(cv::Mat& input,cv::Mat& output, int min, int max, bool equalization)
 {
-    //cv::equalizeHist(input, output);
     int range = max - min;
     int histogram[256];
     imageHist(input,histogram);
 
     int size = input.rows*input.cols;
-    float alpha = range/size;
+    float alpha = (float)range/size;
 
     float proIntensity[256];
     for(int i = 0;i < 256;i++){
         proIntensity[i] = (double)histogram[i] / size; // size = total image pixels
     }
 
-    int cumhistogram[256];
-    cumhist(histogram,cumhistogram);
+    if(equalization)
+    {
+        int cumhistogram[256];
+        cumhist(histogram,cumhistogram);
 
-    //Scale the histogram
-    int scale_his[256];
-    for(int i = 0; i < 256; i++){
-        scale_his[i] = cvRound((double)cumhistogram[i]*alpha);
-    }
+        //Scale the histogram with equalization
+        int scale_his[256];
+        for(int i= 0; i <256; i++) scale_his[i] = 0;
+        for(int i = min; i < max; i++){
+           scale_his[i] = cvRound((double)cumhistogram[i]*alpha);
+         }
 
-    //generate the equalized histogram
-    float equalized_histogram[256];
-    for(int i = 0;i < 256; i++) { equalized_histogram[i] = 0;}
-    for(int i = 0;i < 256; i++) { equalized_histogram[scale_his[i]] = proIntensity[i];}
-
-    cv::Mat temp = input.clone();
-    for(int y = 0; y < input.rows ; y++)
-        for(int x = 0; x < input.cols; x++)
+        cv::Mat temp = input.clone();
+        for(int y = 0; y < input.rows ; y++)
+          for(int x = 0; x < input.cols; x++)
             temp.at<uchar>(y,x) = cv::saturate_cast<uchar>(scale_his[input.at<uchar>(y,x)]);
-    output = temp;
+         output = temp;
+    }
+    else
+    {
+        //Scale the histogram without equalization
+        int scale_his[256];
+        for(int i= 0; i <256; i++) scale_his[i] = 0;
+        for(int i = min; i < max; i++){
+            scale_his[i] = cvRound((double)(i*range/255+min));
+        }
+
+        cv::Mat temp = input.clone();
+        for(int y = 0; y < input.rows ; y++)
+          for(int x = 0; x < input.cols; x++)
+            temp.at<uchar>(y,x) = cv::saturate_cast<uchar>(scale_his[input.at<uchar>(y,x)]);
+        output = temp;
+    }
 }
 
 void histClahe(cv::Mat& input, cv::Mat& output)
@@ -154,12 +167,7 @@ void histClahe(cv::Mat& input, cv::Mat& output)
     clahe->apply(input, output);
 }
 
-void histMathing(cv::Mat& input, cv::Mat& output, window_histmatching* gui) // need color image!
-{
-    gui ->show();
-}
-
-void histDraw(cv::Mat& input, cv::Mat& output){
+void histDraw(cv::Mat& input, cv::Mat& output, int min, int max){
     cv::Mat hist;
 
     int histSize = 256;
@@ -173,19 +181,13 @@ void histDraw(cv::Mat& input, cv::Mat& output){
     cv::Mat histImage(500,600,CV_8UC1, cv::Scalar(255)); //para high, width, type
     cv::normalize(hist,hist,0,hist.rows,cv::NORM_MINMAX,-1,cv::Mat());
 
-    for( int i = 1; i < histSize; i++ )
+    for( int i = min; i < max; i++ )
     {
         cv::line( histImage,
                   cv::Point(bin_w*(i-1), 500 - cvRound(hist.at<float>(i-1))) ,
                   cv::Point(bin_w*(i-1), 500),
                   cv::Scalar(0), 2, 8, 0  );
     }
-    // draw frame
-    cv::line(histImage, cv::Point(0,0), cv::Point(600,0),cv::Scalar(0),1,8,0);
-    cv::line(histImage, cv::Point(0,0), cv::Point(0,500),cv::Scalar(0),1,8,0);
-    cv::line(histImage, cv::Point(599,0), cv::Point(599,500),cv::Scalar(0),1,8,0);
-    cv::line(histImage, cv::Point(0,499), cv::Point(599,499),cv::Scalar(0),1,8,0);
-
     output = histImage;
 }
 

@@ -15,7 +15,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(ui->searchImage, SIGNAL(clicked()), this, SLOT(on_search_file()));
     connect(ui->btnTransform, SIGNAL(clicked()), this, SLOT(on_button()));
-    connect(ui->referenceImageFile,SIGNAL(clicked()),this,SLOT(on_referenceImageFile_clicked()));
 }
 
 
@@ -51,22 +50,16 @@ void MainWindow::on_search_file()
         }
     }
 }
-void MainWindow::on_referenceImageFile_clicked()
-{
-    m_refer = cv::Mat();
-    QString filename = QFileDialog::getOpenFileName(this, "Open Image", "C:/HIWI/images/backscatter", "Images (*.png *.jpg *.bmp)");
-    if(!filename.isEmpty()) {
-        cv::Mat in = cv::imread(filename.toStdString(), 1);
-        cv::cvtColor(in, m_refer,cv::COLOR_BGR2GRAY);
-        if(!m_refer.empty()) {
-        } else {
-            QMessageBox::critical(this, "Image Loading Error", "cannot load the image " + filename);
-        }
-    }
-}
 
-void MainWindow::onMessageSent(int message){
+void MainWindow::onMessageSent(message message_signal){
+    m_scene_res.clear();
+    m_result = m_image.clone();
 
+    //histogram equalization: level adjustment GUI
+    iaw::histEqual_leveladj(m_result,m_result, message_signal.getMin(), message_signal.getMax(),ui->optHisMatching->isChecked());
+    hismatchinggui->setoutput(m_result);
+
+    m_scene_res.addPixmap(QPixmap::fromImage(Mat2QImageGrayscale(m_result)));
 }
 
 void MainWindow::transform()
@@ -105,19 +98,19 @@ void MainWindow::transform()
     if(!ui->optHistogram->isChecked()) {
         if(ui->optHisEqual->isChecked()) {
             iaw::histEqual(m_result, m_result);
-        } else if(ui->optHisMatching->isChecked()) {
+        } else if(ui->optHisMatching->isChecked() || ui->optHisMatchingnoEqu->isChecked()) {
             if(!hismatchinggui)
             {
-                hismatchinggui = new window_histmatching(this);
+                hismatchinggui = new window_histmatching;
+                hismatchinggui->setinput(m_result);
 
                 connect(hismatchinggui, &window_histmatching::notifyMessageSent,this,&MainWindow::onMessageSent);
             }
             hismatchinggui->show();
-            iaw::histMathing(m_result, m_result,hismatchinggui);
         } else if(ui->optHisClahe->isChecked()) {
             iaw::histClahe(m_result, m_result);
         } else if(ui->optHistogramDraw->isChecked()){
-            iaw::histDraw(m_result,m_result);
+            iaw::histDraw(m_result,m_result,0,255);
         }
     }
 

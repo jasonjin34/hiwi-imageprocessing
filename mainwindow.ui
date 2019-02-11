@@ -210,16 +210,16 @@
           </widget>
          </item>
          <item>
-          <widget class="QRadioButton" name="optHisMatching">
+          <widget class="QRadioButton" name="optHisMatchingnoEqu">
            <property name="text">
-            <string>Matching</string>
+            <string>Matching without Equalization</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QToolButton" name="referenceImageFile">
+          <widget class="QRadioButton" name="optHisMatching">
            <property name="text">
-            <string>Add Reference Image</string>
+            <string>Matching with Equalization</string>
            </property>
           </widget>
          </item>

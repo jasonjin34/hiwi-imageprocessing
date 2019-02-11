@@ -15,6 +15,7 @@
 #include "histogram.h"
 #include "imgfunctions.h"
 #include "window_histmatching.h"
+#include "message.h"
 
 
 namespace Ui {
@@ -43,8 +44,7 @@ public slots:
     void on_search_file();
 
 private slots:
-    void on_referenceImageFile_clicked();
-    void onMessageSent(int);
+    void onMessageSent(message);
 
 private:
     void transform();

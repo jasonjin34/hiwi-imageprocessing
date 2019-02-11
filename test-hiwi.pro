@@ -40,14 +40,16 @@ SOURCES += \
         mainwindow.cpp \
     histogram.cpp \
     imgfunctions.cpp \
-    window_histmatching.cpp
+    window_histmatching.cpp \
+    message.cpp
 
 HEADERS += \
         mainwindow.h \
     histogram.h \
     convfunktion.h \
     imgfunctions.h \
-    window_histmatching.h
+    window_histmatching.h \
+    message.h
 
 FORMS += \
         mainwindow.ui \
