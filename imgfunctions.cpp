@@ -78,7 +78,8 @@ void threshold_otsu(cv::Mat& input, cv::Mat& output)
 
 void histEqual(cv::Mat& input, cv::Mat& output)
 {
-    //cv::equalizeHist(input, output);
+    cv::equalizeHist(input, output);
+    /**
     int histogram[256];
     imageHist(input,histogram);
 
@@ -109,6 +110,7 @@ void histEqual(cv::Mat& input, cv::Mat& output)
         for(int x = 0; x < input.cols; x++)
             temp.at<uchar>(y,x) = cv::saturate_cast<uchar>(scale_his[input.at<uchar>(y,x)]);
     output = temp;
+    **/
 }
 
 //histogram equalization for level adjustment gui
@@ -119,11 +121,11 @@ void histEqual_leveladj(cv::Mat& input,cv::Mat& output, int min, int max, bool e
     imageHist(input,histogram);
 
     int size = input.rows*input.cols;
-    float alpha = (float)range/size;
+    float alpha = static_cast<float>(range)/size;
 
     float proIntensity[256];
     for(int i = 0;i < 256;i++){
-        proIntensity[i] = (double)histogram[i] / size; // size = total image pixels
+        proIntensity[i] = static_cast<float>(histogram[i]) / size; // size = total image pixels
     }
 
     if(equalization)
@@ -135,7 +137,7 @@ void histEqual_leveladj(cv::Mat& input,cv::Mat& output, int min, int max, bool e
         int scale_his[256];
         for(int i= 0; i <256; i++) scale_his[i] = 0;
         for(int i = min; i < max; i++){
-           scale_his[i] = cvRound((double)cumhistogram[i]*alpha);
+           scale_his[i] = cvRound(static_cast<float>(cumhistogram[i])*alpha);
          }
 
         cv::Mat temp = input.clone();
@@ -150,7 +152,7 @@ void histEqual_leveladj(cv::Mat& input,cv::Mat& output, int min, int max, bool e
         int scale_his[256];
         for(int i= 0; i <256; i++) scale_his[i] = 0;
         for(int i = min; i < max; i++){
-            scale_his[i] = cvRound((double)(i*range/255+min));
+            scale_his[i] = cvRound(static_cast<double>(i*range/255)+min);
         }
 
         cv::Mat temp = input.clone();
