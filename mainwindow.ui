@@ -377,11 +377,24 @@
     </property>
     <addaction name="actionSearch"/>
    </widget>
+   <widget class="QMenu" name="menuCurve">
+    <property name="title">
+     <string>Adjustment</string>
+    </property>
+    <addaction name="separator"/>
+    <addaction name="actionCurve"/>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuCurve"/>
   </widget>
   <action name="actionSearch">
    <property name="text">
     <string>Load Image</string>
+   </property>
+  </action>
+  <action name="actionCurve">
+   <property name="text">
+    <string>Curve</string>
    </property>
   </action>
  </widget>

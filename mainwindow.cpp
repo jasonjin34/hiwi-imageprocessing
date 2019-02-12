@@ -129,3 +129,9 @@ void MainWindow::transform()
     m_scene_res.addPixmap(QPixmap::fromImage(Mat2QImageGrayscale(m_result)));
 }
 
+
+void MainWindow::on_actionCurve_triggered()
+{
+    curvegui = new Curve;
+    curvegui->show();
+}

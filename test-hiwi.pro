@@ -6,7 +6,7 @@
 
 QT       += core gui xml
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
 
 TARGET = test-hiwi
 DESTDIR = "C:\HIWI\Release"
@@ -41,7 +41,9 @@ SOURCES += \
     histogram.cpp \
     imgfunctions.cpp \
     window_histmatching.cpp \
-    message.cpp
+    message.cpp \
+    qcustomplot.cpp \
+    curve.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -49,11 +51,14 @@ HEADERS += \
     convfunktion.h \
     imgfunctions.h \
     window_histmatching.h \
-    message.h
+    message.h \
+    qcustomplot.h \
+    curve.h
 
 FORMS += \
         mainwindow.ui \
-    window_histmatching.ui
+    window_histmatching.ui \
+    curve.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

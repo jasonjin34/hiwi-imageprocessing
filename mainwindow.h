@@ -15,6 +15,7 @@
 #include "histogram.h"
 #include "imgfunctions.h"
 #include "window_histmatching.h"
+#include "curve.h"
 #include "message.h"
 
 
@@ -28,6 +29,7 @@ class MainWindow : public QMainWindow
 
     Ui::MainWindow  *ui;
     window_histmatching *hismatchinggui;
+    Curve *curvegui;
     QGraphicsScene  m_scene_orig, m_scene_res;
     QGraphicsView   m_view;
     cv::Mat         m_image;
@@ -45,6 +47,8 @@ public slots:
 
 private slots:
     void onMessageSent(message);
+
+    void on_actionCurve_triggered();
 
 private:
     void transform();
