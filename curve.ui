@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>511</width>
-    <height>458</height>
+    <width>509</width>
+    <height>401</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <property name="geometry">
     <rect>
      <x>80</x>
-     <y>30</y>
+     <y>10</y>
      <width>341</width>
      <height>321</height>
     </rect>
@@ -26,8 +26,8 @@
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>440</x>
-     <y>130</y>
+     <x>430</x>
+     <y>120</y>
      <width>61</width>
      <height>86</height>
     </rect>
@@ -66,8 +66,8 @@
   <widget class="QPushButton" name="addpoint1">
    <property name="geometry">
     <rect>
-     <x>270</x>
-     <y>400</y>
+     <x>250</x>
+     <y>350</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -79,8 +79,8 @@
   <widget class="QPushButton" name="button_clear">
    <property name="geometry">
     <rect>
-     <x>400</x>
-     <y>400</y>
+     <x>350</x>
+     <y>350</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -89,11 +89,37 @@
     <string>Clear</string>
    </property>
   </widget>
+  <widget class="QLabel" name="label_5">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>100</y>
+     <width>61</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>alpha value</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_6">
+   <property name="geometry">
+    <rect>
+     <x>430</x>
+     <y>100</y>
+     <width>61</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>beta value</string>
+   </property>
+  </widget>
   <widget class="QWidget" name="">
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>130</y>
+     <y>120</y>
      <width>61</width>
      <height>86</height>
     </rect>
