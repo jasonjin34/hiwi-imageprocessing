@@ -42,4 +42,6 @@ void imageHist(cv::Mat input, int histogram[]);
 
 void cumhist(int hist[], int cumhist[]);
 
+void contrastAdjustment(cv::Mat& input, cv::Mat& output, double alpha, double beta);
+
 }

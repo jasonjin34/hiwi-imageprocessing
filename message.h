@@ -11,9 +11,15 @@ public:
     int getMin();
     void setMin(int);
     void setMax(int);
+    void setAlphaMin(double);
+    void setAlphaMax(double);
+    double getalpha();
+    double getbeta();
 private:
     int max;
     int min;
+    double alpha_min;
+    double alpha_max;
 };
 
 #endif // MESSAGE_H

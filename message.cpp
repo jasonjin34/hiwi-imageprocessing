@@ -26,3 +26,23 @@ void message::setMin(int min){
 void message::setMax(int max){
     this->max = max;
 }
+
+void message::setAlphaMin(double min)
+{
+    this->alpha_min = min;
+}
+
+void message::setAlphaMax(double max)
+{
+    this->alpha_max = max;
+}
+
+double message::getalpha()
+{
+    return this->alpha_min;
+}
+
+double message::getbeta()
+{
+    return this->alpha_max;
+}

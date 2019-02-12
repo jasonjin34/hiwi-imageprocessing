@@ -47,7 +47,7 @@ public slots:
 
 private slots:
     void onMessageSent(message);
-
+    void onMessageSentCurve(message);
     void on_actionCurve_triggered();
 
 private:

@@ -2,6 +2,8 @@
 #include "ui_curve.h"
 #include <QDebug>
 
+message message_singal_curve;
+
 Curve::Curve(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::Curve)
@@ -11,23 +13,13 @@ Curve::Curve(QWidget *parent) :
     ui->curve_plot->addGraph();
     ui->curve_plot->xAxis->setRange(0,255);
     ui->curve_plot->yAxis->setRange(0,255);
-    ui->curve_plot->graph(0)->setLineStyle(QCPGraph::lsNone);
+    ui->curve_plot->graph(0)->setLineStyle(QCPGraph::lsLine);
     ui->curve_plot->graph(0)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle));
 
 
     connect(ui->addpoint1, SIGNAL(clicked()), this, SLOT(on_addpoint1_click()));
     connect(ui->button_clear,SIGNAL(clicked()),this,SLOT(on_button_clear_clicked()));
     connect(ui->curve_plot,SIGNAL(mousePress(QMouseEvent*)),this,SLOT(clickedGraph(QMouseEvent*)));
-    qDebug() << "pass";
-    int size = 10;
-    QVector<double> x(size),y(size);
-
-    /**
-    for(int i = 0; i < size; ++i){
-        x[i] = i;
-        y[i] = i;
-    }
-    **/
 }
 
 Curve::~Curve()
@@ -72,17 +64,67 @@ void Curve::on_button_clear_clicked()
     plot();
 }
 
+double Curve::interpolation(double x)
+{
+    double x1 = 0.0;
+    double x2 = qv_x.back();
+    double x3 = qv_x.front();
+    double x4 = 255.0;
+
+    double y2 = qv_y.back();
+    double y3 = qv_y.front();
+    double y4 = 255.0;
+
+    double a_coeff, b_coeff, c_coeff, d_coeff;
+    a_coeff = 0.0;
+    b_coeff = (x - x1)*(x - x3)*(x - x4)*y2/((x2 - x1)*(x2 - x3)*(x2 - x4));
+    c_coeff = (x - x1)*(x - x2)*(x - x4)*y3/((x3 - x1)*(x3 - x2)*(x3 - x4));
+    d_coeff = (x - x1)*(x - x2)*(x - x3)*y4/((x4 - x1)*(x4 - x2)*(x4 - x3));
+
+    return a_coeff + b_coeff + c_coeff + d_coeff;
+}
+
+
 void Curve::clickedGraph(QMouseEvent *event)
 {
     QPoint point = event->pos();
     double x_value = ui->curve_plot->xAxis->pixelToCoord((point.x()));
     double y_value = ui->curve_plot->yAxis->pixelToCoord((point.y()));
 
+    addPoint(x_value,y_value);
+
     ui->x_point1->setValue(qv_x.front());
     ui->y_point1->setValue(qv_y.front());
     ui->x_point2->setValue(qv_x.back());
     ui->y_point2->setValue(qv_y.back());
 
-    addPoint(x_value,y_value);
-    plot();
+    //spline cubic interpolator
+    if(qv_x.size()>=2)
+    {
+       QVector<double> image_interoplation_y;
+       QVector<double> image_interoplation_x;
+       for(int i = 0; i < 255; i++)
+       {
+           image_interoplation_y.append(interpolation(i));
+           image_interoplation_x.append(i);
+       }
+       ui->curve_plot->graph(0)->setData(image_interoplation_x,image_interoplation_y);
+       ui->curve_plot->replot();
+       ui->curve_plot->update();
+    }
+    else{
+          plot();
+    }
+}
+
+void Curve::on_x_point1_valueChanged(double arg1)
+{
+    message_singal_curve.setAlphaMin(1.0 + 2.0*arg1/255.0);
+    emit notifyMessageSentCurve(message_singal_curve);
+}
+
+void Curve::on_x_point2_valueChanged(double arg1)
+{
+    message_singal_curve.setAlphaMax(100.0*arg1/255.0);
+    emit notifyMessageSentCurve(message_singal_curve);
 }

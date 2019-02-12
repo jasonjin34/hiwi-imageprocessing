@@ -2,6 +2,7 @@
 #define CURVE_H
 
 #include <QDialog>
+#include "message.h"
 
 namespace Ui {
 class Curve;
@@ -17,13 +18,19 @@ public:
     void addPoint(double x, double y);
     void clearData();
     void plot();
+signals:
+    void notifyMessageSentCurve(const message&);
 
 private slots:
 
     void on_addpoint1_clicked();
     void clickedGraph(QMouseEvent *event);
     void on_button_clear_clicked();
+    double interpolation(double x);
 
+    void on_x_point1_valueChanged(double arg1);
+
+    void on_x_point2_valueChanged(double arg1);
 
 private:
     Ui::Curve *ui;

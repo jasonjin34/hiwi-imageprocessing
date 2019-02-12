@@ -207,4 +207,12 @@ void cannyEdge(cv::Mat& input, cv::Mat &output, int min, bool merge)
     }
 }
 
+void contrastAdjustment(cv::Mat& input, cv::Mat& output, double alpha, double beta)
+{
+    output = input.clone();
+    for(int x = 0; x < input.cols; x++)
+        for(int y = 0; y < input.rows; y++)
+             output.at<uchar>(y,x) = cv::saturate_cast<uchar>(alpha*static_cast<double>(input.at<uchar>(y,x)) + beta);
+}
+
 }

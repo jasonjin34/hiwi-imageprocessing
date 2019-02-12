@@ -62,6 +62,14 @@ void MainWindow::onMessageSent(message message_signal){
     m_scene_res.addPixmap(QPixmap::fromImage(Mat2QImageGrayscale(m_result)));
 }
 
+void MainWindow::onMessageSentCurve(message message_signalcurve)
+{
+    m_scene_res.clear();
+    m_result = m_image.clone();
+    iaw::contrastAdjustment(m_result,m_result,message_signalcurve.getalpha(),message_signalcurve.getbeta());
+    m_scene_res.addPixmap(QPixmap::fromImage(Mat2QImageGrayscale(m_result)));
+}
+
 void MainWindow::transform()
 {
     m_scene_res.clear();
@@ -134,4 +142,5 @@ void MainWindow::on_actionCurve_triggered()
 {
     curvegui = new Curve;
     curvegui->show();
+    connect(curvegui,&Curve::notifyMessageSentCurve, this, &MainWindow::onMessageSentCurve);
 }

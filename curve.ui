@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Brightness and contrast adjustments Curve</string>
   </property>
   <widget class="QCustomPlot" name="curve_plot" native="true">
    <property name="geometry">
