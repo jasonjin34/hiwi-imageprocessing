@@ -50,6 +50,8 @@ private slots:
     void onMessageSentCurve(message);
     void on_actionCurve_triggered();
 
+    void on_resetbutton_clicked();
+
 private:
     void transform();
 };

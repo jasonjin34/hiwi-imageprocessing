@@ -342,6 +342,13 @@
        </spacer>
       </item>
       <item>
+       <widget class="QPushButton" name="resetbutton">
+        <property name="text">
+         <string>Reset</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QPushButton" name="btnTransform">
         <property name="text">
          <string>Transform</string>

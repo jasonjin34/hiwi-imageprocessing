@@ -9,7 +9,6 @@ void imageHist(cv::Mat input, int histogram[])
     for(int i = 0; i < 256; i++){
         histogram[i] = 0;
     }
-
     for(int i = 0; i < input.rows; i ++)
         for( int x = 0; x < input.cols; x++)
             histogram[static_cast<int>(input.at<uchar>(i,x))]++;
@@ -79,38 +78,6 @@ void threshold_otsu(cv::Mat& input, cv::Mat& output)
 void histEqual(cv::Mat& input, cv::Mat& output)
 {
     cv::equalizeHist(input, output);
-    /**
-    int histogram[256];
-    imageHist(input,histogram);
-
-    int size = input.rows*input.cols;
-    float alpha = 255.0/size;
-
-    float proIntensity[256];
-    for(int i = 0;i < 256;i++){
-        proIntensity[i] = (double)histogram[i] / size; // size = total image pixels
-    }
-
-    int cumhistogram[256];
-    cumhist(histogram,cumhistogram);
-
-    //Scale the histogram
-    int scale_his[256];
-    for(int i = 0; i < 256; i++){
-        scale_his[i] = cvRound((double)cumhistogram[i]*alpha);
-    }
-
-    //generate the equalized histogram
-    float equalized_histogram[256];
-    for(int i = 0;i < 256; i++) { equalized_histogram[i] = 0;}
-    for(int i = 0;i < 256; i++) { equalized_histogram[scale_his[i]] = proIntensity[i];}
-
-    cv::Mat temp = input.clone();
-    for(int y = 0; y < input.rows ; y++)
-        for(int x = 0; x < input.cols; x++)
-            temp.at<uchar>(y,x) = cv::saturate_cast<uchar>(scale_his[input.at<uchar>(y,x)]);
-    output = temp;
-    **/
 }
 
 //histogram equalization for level adjustment gui
@@ -137,14 +104,14 @@ void histEqual_leveladj(cv::Mat& input,cv::Mat& output, int min, int max, bool e
         int scale_his[256];
         for(int i= 0; i <256; i++) scale_his[i] = 0;
         for(int i = min; i < max; i++){
-           scale_his[i] = cvRound(static_cast<float>(cumhistogram[i])*alpha);
-         }
+            scale_his[i] = cvRound(static_cast<float>(cumhistogram[i])*alpha);
+        }
 
         cv::Mat temp = input.clone();
         for(int y = 0; y < input.rows ; y++)
-          for(int x = 0; x < input.cols; x++)
-            temp.at<uchar>(y,x) = cv::saturate_cast<uchar>(scale_his[input.at<uchar>(y,x)]);
-         output = temp;
+            for(int x = 0; x < input.cols; x++)
+                temp.at<uchar>(y,x) = cv::saturate_cast<uchar>(scale_his[input.at<uchar>(y,x)]);
+        output = temp;
     }
     else
     {
@@ -157,8 +124,8 @@ void histEqual_leveladj(cv::Mat& input,cv::Mat& output, int min, int max, bool e
 
         cv::Mat temp = input.clone();
         for(int y = 0; y < input.rows ; y++)
-          for(int x = 0; x < input.cols; x++)
-            temp.at<uchar>(y,x) = cv::saturate_cast<uchar>(scale_his[input.at<uchar>(y,x)]);
+            for(int x = 0; x < input.cols; x++)
+                temp.at<uchar>(y,x) = cv::saturate_cast<uchar>(scale_his[input.at<uchar>(y,x)]);
         output = temp;
     }
 }
@@ -221,16 +188,16 @@ void contrastAdjInterpolation(cv::Mat &input, cv::Mat &output, QVector<double> a
 {
     output = input.clone();
     for(int x = 0; x < input.cols; x++)
-     {
+    {
         for(int y = 0; y < input.rows; y++)
+        {
+            double temp = alphavectorptr.at(static_cast<int>(static_cast<double>(input.at<uchar>(y,x))));
+            if(temp <= 255 || temp >= 0 )
             {
-                double temp = alphavectorptr.at(static_cast<int>(static_cast<double>(input.at<uchar>(y,x))));
-                if(temp <= 255 || temp >= 0 )
-                {
-                    output.at<uchar>(y,x) = cv::saturate_cast<uchar>(temp);
-                }
+                output.at<uchar>(y,x) = cv::saturate_cast<uchar>(temp);
             }
-     }
+        }
+    }
 }
 
 }

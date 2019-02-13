@@ -1,5 +1,6 @@
 #include "curve.h"
 #include "ui_curve.h"
+#include <QDebug>
 
 message message_singal_curve;
 
@@ -14,6 +15,8 @@ Curve::Curve(QWidget *parent) :
     ui->curve_plot->yAxis->setRange(0,255);
     ui->curve_plot->graph(0)->setLineStyle(QCPGraph::lsLine);
     ui->curve_plot->graph(0)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle));
+    ui->curve_plot->xAxis->setLabel("Pixel Intensity");
+    ui->curve_plot->yAxis->setLabel("Dark                                                                            Light");
 
 
     connect(ui->addpoint1, SIGNAL(clicked()), this, SLOT(on_addpoint1_click()));
@@ -69,7 +72,7 @@ double Curve::interpolation(double x)
         double temp_coeff = 1.0;
         for(int k = 0; k < qv_x.size();++k){
             if(k != j){
-                 temp_coeff = temp_coeff* (x - qv_x.at(k))/(qv_x.at(j) - qv_x.at(k));
+                temp_coeff = temp_coeff* (x - qv_x.at(k))/(qv_x.at(j) - qv_x.at(k));
             }
         }
         coeff_lagrange.append(temp_coeff);
@@ -98,21 +101,21 @@ void Curve::clickedGraph(QMouseEvent *event)
 
     if(qv_x.size() == ui->numInterpolation->text().toInt())
     {
-       QVector<double> image_interoplation_y;
-       QVector<double> image_interoplation_x;
-       for(int i = 1; i < 255; i++)
-       {
-           image_interoplation_y.append(interpolation(static_cast<double>(i)));
-           image_interoplation_x.append(i);
-       }
-       ui->curve_plot->graph(0)->setData(image_interoplation_x,image_interoplation_y);
-       ui->curve_plot->replot();
-       ui->curve_plot->update();
-       message_singal_curve.setalphafactor(image_interoplation_y);
-       emit notifyMessageSentCurve(message_singal_curve);
+        QVector<double> image_interoplation_y;
+        QVector<double> image_interoplation_x;
+        for(int i = 1; i < 255; i++)
+        {
+            image_interoplation_y.append(interpolation(static_cast<double>(i)));
+            image_interoplation_x.append(i);
+        }
+        ui->curve_plot->graph(0)->setData(image_interoplation_x,image_interoplation_y);
+        ui->curve_plot->replot();
+        ui->curve_plot->update();
+        message_singal_curve.setalphafactor(image_interoplation_y);
+        emit notifyMessageSentCurve(message_singal_curve);
     }
     else{
-          plot();
+        plot();
     }
 }
 

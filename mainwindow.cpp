@@ -15,6 +15,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(ui->searchImage, SIGNAL(clicked()), this, SLOT(on_search_file()));
     connect(ui->btnTransform, SIGNAL(clicked()), this, SLOT(on_button()));
+    connect(ui->resetbutton, SIGNAL(clicked()),this, SLOT(on_resetbutton_clicked()));
 }
 
 
@@ -39,7 +40,7 @@ void MainWindow::on_search_file()
     m_scene_res.clear();
 
     QString filename = QFileDialog::getOpenFileName(this, "Open Image", "C:/HIWI/images/backscatter", "Images (*.png *.jpg *.bmp)");
-    if(!filename.isEmpty()) {        
+    if(!filename.isEmpty()) {
         cv::Mat in = cv::imread(filename.toStdString(), 1);
         cv::cvtColor(in, m_image,cv::COLOR_BGR2GRAY);
         if(!m_image.empty()) {
@@ -54,7 +55,6 @@ void MainWindow::on_search_file()
 void MainWindow::onMessageSent(message message_signal){
     m_scene_res.clear();
     m_result = m_image.clone();
-
     //histogram equalization: level adjustment GUI
     iaw::histEqual_leveladj(m_result,m_result, message_signal.getMin(), message_signal.getMax(),ui->optHisMatching->isChecked());
     hismatchinggui->setoutput(m_result);
@@ -68,15 +68,18 @@ void MainWindow::onMessageSentCurve(message message_signalcurve)
     m_result = m_image.clone();
     if(message_signalcurve.getalphaptr().size() >= 254)
     {
-         iaw::contrastAdjInterpolation(m_result,m_result,message_signalcurve.getalphaptr());
-         m_scene_res.addPixmap(QPixmap::fromImage(Mat2QImageGrayscale(m_result)));
+        iaw::contrastAdjInterpolation(m_result,m_result,message_signalcurve.getalphaptr());
+        m_scene_res.addPixmap(QPixmap::fromImage(Mat2QImageGrayscale(m_result)));
     }
 }
 
 void MainWindow::transform()
 {
     m_scene_res.clear();
-    m_result = m_image.clone();
+    if(m_result.empty())
+    {
+        m_result = m_image.clone();
+    }
 
     if(!ui->optNoise->isChecked()) {
         if(ui->optNoiseBlur->isChecked()) {
@@ -136,7 +139,6 @@ void MainWindow::transform()
             iaw::cannyEdge(m_result, m_result, 100, ui->optCannyMerge->isChecked());
         }
     }
-
     m_scene_res.addPixmap(QPixmap::fromImage(Mat2QImageGrayscale(m_result)));
 }
 
@@ -150,4 +152,11 @@ void MainWindow::on_actionCurve_triggered()
     } else {
         QMessageBox::critical(this, "Image Curve Error", "image is not loaded");
     }
+}
+
+
+void MainWindow::on_resetbutton_clicked()
+{
+    m_result = m_image.clone();
+    m_scene_res.addPixmap(QPixmap::fromImage(Mat2QImageGrayscale(m_result)));
 }
