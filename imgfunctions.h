@@ -4,6 +4,7 @@
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/types_c.h>
+#include <QVector>
 
 namespace iaw
 {
@@ -43,5 +44,7 @@ void imageHist(cv::Mat input, int histogram[]);
 void cumhist(int hist[], int cumhist[]);
 
 void contrastAdjustment(cv::Mat& input, cv::Mat& output, double alpha, double beta);
+
+void contrastAdjInterpolation(cv::Mat& input, cv::Mat& output, QVector<double>);
 
 }

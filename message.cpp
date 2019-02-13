@@ -37,6 +37,11 @@ void message::setAlphaMax(double max)
     this->alpha_max = max;
 }
 
+void message::setalphafactor(QVector<double>& vectorptr)
+{
+    this->alphafactor = vectorptr;
+}
+
 double message::getalpha()
 {
     return this->alpha_min;
@@ -45,4 +50,9 @@ double message::getalpha()
 double message::getbeta()
 {
     return this->alpha_max;
+}
+
+QVector<double> message::getalphaptr()
+{
+    return this->alphafactor;
 }

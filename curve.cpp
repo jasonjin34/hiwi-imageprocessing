@@ -1,6 +1,5 @@
 #include "curve.h"
 #include "ui_curve.h"
-#include <QDebug>
 
 message message_singal_curve;
 
@@ -29,13 +28,10 @@ Curve::~Curve()
 
 void Curve::addPoint(double x, double y)
 {
-    qv_x.append(x);
-    qv_y.append(y);
-
-    if(qv_x.size() > 2)
+    if(qv_x.size() <= ui->numInterpolation->text().toInt() + 1) //max interpolation point
     {
-        qv_x.pop_front();
-        qv_y.pop_front();
+        qv_x.append(x);
+        qv_y.append(y);
     }
 }
 
@@ -66,22 +62,24 @@ void Curve::on_button_clear_clicked()
 
 double Curve::interpolation(double x)
 {
-    double x1 = 0.0;
-    double x2 = qv_x.back();
-    double x3 = qv_x.front();
-    double x4 = 255.0;
+    //largarne basis
+    QVector<double> coeff_lagrange;
+    for(int j = 0; j < qv_x.size();++j)
+    {
+        double temp_coeff = 1.0;
+        for(int k = 0; k < qv_x.size();++k){
+            if(k != j){
+                 temp_coeff = temp_coeff* (x - qv_x.at(k))/(qv_x.at(j) - qv_x.at(k));
+            }
+        }
+        coeff_lagrange.append(temp_coeff);
+    }
+    double output_temp = 0.0;
+    for(int i = 0; i < qv_x.size();i++){
+        output_temp =  output_temp + coeff_lagrange.at(i) * qv_y.at(i);
+    }
 
-    double y2 = qv_y.back();
-    double y3 = qv_y.front();
-    double y4 = 255.0;
-
-    double a_coeff, b_coeff, c_coeff, d_coeff;
-    a_coeff = 0.0;
-    b_coeff = (x - x1)*(x - x3)*(x - x4)*y2/((x2 - x1)*(x2 - x3)*(x2 - x4));
-    c_coeff = (x - x1)*(x - x2)*(x - x4)*y3/((x3 - x1)*(x3 - x2)*(x3 - x4));
-    d_coeff = (x - x1)*(x - x2)*(x - x3)*y4/((x4 - x1)*(x4 - x2)*(x4 - x3));
-
-    return a_coeff + b_coeff + c_coeff + d_coeff;
+    return output_temp;
 }
 
 
@@ -98,19 +96,20 @@ void Curve::clickedGraph(QMouseEvent *event)
     ui->x_point2->setValue(qv_x.back());
     ui->y_point2->setValue(qv_y.back());
 
-    //spline cubic interpolator
-    if(qv_x.size()>=2)
+    if(qv_x.size() == ui->numInterpolation->text().toInt())
     {
        QVector<double> image_interoplation_y;
        QVector<double> image_interoplation_x;
-       for(int i = 0; i < 255; i++)
+       for(int i = 1; i < 255; i++)
        {
-           image_interoplation_y.append(interpolation(i));
+           image_interoplation_y.append(interpolation(static_cast<double>(i)));
            image_interoplation_x.append(i);
        }
        ui->curve_plot->graph(0)->setData(image_interoplation_x,image_interoplation_y);
        ui->curve_plot->replot();
        ui->curve_plot->update();
+       message_singal_curve.setalphafactor(image_interoplation_y);
+       emit notifyMessageSentCurve(message_singal_curve);
     }
     else{
           plot();

@@ -99,7 +99,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>alpha value</string>
+    <string>first point</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_6">
@@ -112,10 +112,10 @@
     </rect>
    </property>
    <property name="text">
-    <string>beta value</string>
+    <string>last point</string>
    </property>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -154,6 +154,29 @@
      </widget>
     </item>
    </layout>
+  </widget>
+  <widget class="QLabel" name="label_7">
+   <property name="geometry">
+    <rect>
+     <x>110</x>
+     <y>340</y>
+     <width>141</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Interpolation Point</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="numInterpolation">
+   <property name="geometry">
+    <rect>
+     <x>120</x>
+     <y>360</y>
+     <width>51</width>
+     <height>20</height>
+    </rect>
+   </property>
   </widget>
  </widget>
  <customwidgets>

@@ -212,7 +212,25 @@ void contrastAdjustment(cv::Mat& input, cv::Mat& output, double alpha, double be
     output = input.clone();
     for(int x = 0; x < input.cols; x++)
         for(int y = 0; y < input.rows; y++)
-             output.at<uchar>(y,x) = cv::saturate_cast<uchar>(alpha*static_cast<double>(input.at<uchar>(y,x)) + beta);
+            output.at<uchar>(y,x) = cv::saturate_cast<uchar>(alpha*static_cast<double>(input.at<uchar>(y,x)) + beta);
+}
+
+
+
+void contrastAdjInterpolation(cv::Mat &input, cv::Mat &output, QVector<double> alphavectorptr)
+{
+    output = input.clone();
+    for(int x = 0; x < input.cols; x++)
+     {
+        for(int y = 0; y < input.rows; y++)
+            {
+                double temp = alphavectorptr.at(static_cast<int>(static_cast<double>(input.at<uchar>(y,x))));
+                if(temp <= 255 || temp >= 0 )
+                {
+                    output.at<uchar>(y,x) = cv::saturate_cast<uchar>(temp);
+                }
+            }
+     }
 }
 
 }

@@ -66,8 +66,11 @@ void MainWindow::onMessageSentCurve(message message_signalcurve)
 {
     m_scene_res.clear();
     m_result = m_image.clone();
-    iaw::contrastAdjustment(m_result,m_result,message_signalcurve.getalpha(),message_signalcurve.getbeta());
-    m_scene_res.addPixmap(QPixmap::fromImage(Mat2QImageGrayscale(m_result)));
+    if(message_signalcurve.getalphaptr().size() >= 254)
+    {
+         iaw::contrastAdjInterpolation(m_result,m_result,message_signalcurve.getalphaptr());
+         m_scene_res.addPixmap(QPixmap::fromImage(Mat2QImageGrayscale(m_result)));
+    }
 }
 
 void MainWindow::transform()
