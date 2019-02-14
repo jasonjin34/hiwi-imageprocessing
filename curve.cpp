@@ -16,12 +16,12 @@ Curve::Curve(QWidget *parent) :
     ui->curve_plot->graph(0)->setLineStyle(QCPGraph::lsLine);
     ui->curve_plot->graph(0)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle));
     ui->curve_plot->xAxis->setLabel("Pixel Intensity");
-    ui->curve_plot->yAxis->setLabel("Dark                                                                            Light");
+    ui->curve_plot->yAxis->setLabel("Dark                                                                              Light");
 
-
-    connect(ui->addpoint1, SIGNAL(clicked()), this, SLOT(on_addpoint1_click()));
     connect(ui->button_clear,SIGNAL(clicked()),this,SLOT(on_button_clear_clicked()));
     connect(ui->curve_plot,SIGNAL(mousePress(QMouseEvent*)),this,SLOT(clickedGraph(QMouseEvent*)));
+    connect(ui->Reset_button,SIGNAL(clicked()),this,SLOT(on_Reset_button_clicked()));
+
 }
 
 Curve::~Curve()
@@ -49,12 +49,6 @@ void Curve::plot()
     ui->curve_plot->graph(0)->setData(qv_x,qv_y);
     ui->curve_plot->replot();
     ui->curve_plot->update();
-}
-
-void Curve::on_addpoint1_clicked()
-{
-    addPoint(ui->x_point1->value(),ui->y_point1->value());
-    plot();
 }
 
 void Curve::on_button_clear_clicked()
@@ -128,5 +122,12 @@ void Curve::on_x_point1_valueChanged(double arg1)
 void Curve::on_x_point2_valueChanged(double arg1)
 {
     message_singal_curve.setAlphaMax(100.0*arg1/255.0);
+    emit notifyMessageSentCurve(message_singal_curve);
+}
+
+void Curve::on_Reset_button_clicked()
+{
+    message_singal_curve.clearMessage();
+    message_singal_curve.setReset(true);
     emit notifyMessageSentCurve(message_singal_curve);
 }

@@ -71,7 +71,12 @@ void MainWindow::onMessageSentCurve(message message_signalcurve)
         iaw::contrastAdjInterpolation(m_result,m_result,message_signalcurve.getalphaptr());
         m_scene_res.addPixmap(QPixmap::fromImage(Mat2QImageGrayscale(m_result)));
     }
+    else if (message_signalcurve.getReset())
+    {
+        on_resetbutton_clicked();
+    }
 }
+
 
 void MainWindow::transform()
 {

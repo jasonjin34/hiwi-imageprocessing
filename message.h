@@ -8,8 +8,10 @@ class message
 public:
     message();
     message(int,int);
+    bool getReset();
     int getMax();
     int getMin();
+    void setReset(bool);
     void setMin(int);
     void setMax(int);
     void setAlphaMin(double);
@@ -18,10 +20,12 @@ public:
     double getalpha();
     double getbeta();
     QVector<double> getalphaptr();
+    void clearMessage();
 
 private:
     int max;
     int min;
+    bool reset;
     double alpha_min;
     double alpha_max;
     QVector<double> alphafactor;

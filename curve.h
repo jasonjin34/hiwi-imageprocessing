@@ -22,15 +22,12 @@ signals:
     void notifyMessageSentCurve(const message&);
 
 private slots:
-
-    void on_addpoint1_clicked();
     void clickedGraph(QMouseEvent *event);
     void on_button_clear_clicked();
     double interpolation(double x);
-
     void on_x_point1_valueChanged(double arg1);
-
     void on_x_point2_valueChanged(double arg1);
+    void on_Reset_button_clicked();
 
 private:
     Ui::Curve *ui;

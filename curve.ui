@@ -36,7 +36,7 @@
     <string>Clear</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="addpoint1">
+  <widget class="QPushButton" name="Reset_button">
    <property name="geometry">
     <rect>
      <x>360</x>
@@ -46,10 +46,10 @@
     </rect>
    </property>
    <property name="text">
-    <string>Add</string>
+    <string>Reset</string>
    </property>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>490</x>
@@ -151,7 +151,11 @@
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="numInterpolation"/>
+       <widget class="QLineEdit" name="numInterpolation">
+        <property name="text">
+         <string>4</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </item>

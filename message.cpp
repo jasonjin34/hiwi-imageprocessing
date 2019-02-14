@@ -11,8 +11,18 @@ message::message(int min, int max){
     this->max = max;
 }
 
+bool message::getReset()
+{
+    return this->reset;
+}
+
 int message::getMin(){
     return this->min;
+}
+
+void message::setReset(bool status)
+{
+    this->reset = status;
 }
 
 int message::getMax(){
@@ -55,4 +65,14 @@ double message::getbeta()
 QVector<double> message::getalphaptr()
 {
     return this->alphafactor;
+}
+
+void message::clearMessage()
+{
+    this->setMax(0);
+    this->setAlphaMax(0.0);
+    this->setAlphaMin(0.0);
+    this->setMin(0);
+    alphafactor.clear();
+    this->setReset(false);
 }
