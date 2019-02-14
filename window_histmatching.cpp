@@ -64,3 +64,4 @@ void window_histmatching::on_minIntensity_valueChanged(int arg1)
     QImage dest_scaled = dest.scaled(400,300, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
     output_scene.addPixmap(QPixmap::fromImage(dest_scaled));
 }
+

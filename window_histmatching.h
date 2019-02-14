@@ -33,6 +33,7 @@ private slots:
 
     void on_minIntensity_valueChanged(int arg1);
 
+
 private:
     Ui::window_histmatching *ui;
     cv::Mat input;

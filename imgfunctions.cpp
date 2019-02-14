@@ -3,7 +3,6 @@
 
 namespace iaw
 {
-//test draw image histogram function
 void imageHist(cv::Mat input, int histogram[])
 {
     for(int i = 0; i < 256; i++){
@@ -130,6 +129,7 @@ void histEqual_leveladj(cv::Mat& input,cv::Mat& output, int min, int max, bool e
     }
 }
 
+
 void histClahe(cv::Mat& input, cv::Mat& output)
 {
     cv::Ptr<cv::CLAHE> clahe = cv::createCLAHE(30,cv::Size(2,2));
@@ -199,5 +199,6 @@ void contrastAdjInterpolation(cv::Mat &input, cv::Mat &output, QVector<double> a
         }
     }
 }
+
 
 }
