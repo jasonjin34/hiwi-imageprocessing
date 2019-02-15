@@ -65,3 +65,15 @@ void window_histmatching::on_minIntensity_valueChanged(int arg1)
     output_scene.addPixmap(QPixmap::fromImage(dest_scaled));
 }
 
+
+void window_histmatching::on_verticalMiddle_valueChanged(int value)
+{
+    message_signal.setMiddle(value);
+    emit notifyMessageSent(message_signal);
+    cv::Mat output; //histogram output
+    iaw::histDraw(this->output_src,output,message_signal.getMin(),message_signal.getMax());
+
+    QImage dest(output.data,output.cols,output.rows,static_cast<int>(output.step),QImage::Format_Grayscale8);
+    QImage dest_scaled = dest.scaled(400,300, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+    output_scene.addPixmap(QPixmap::fromImage(dest_scaled));
+}

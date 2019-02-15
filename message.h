@@ -7,11 +7,13 @@ class message
 {
 public:
     message();
-    message(int,int);
+    message(int,int,double);
     bool getReset();
     int getMax();
     int getMin();
+    double getMiddle();
     void setReset(bool);
+    void setMiddle(int);
     void setMin(int);
     void setMax(int);
     void setAlphaMin(double);
@@ -23,6 +25,7 @@ public:
     void clearMessage();
 
 private:
+    double middle;
     int max;
     int min;
     bool reset;

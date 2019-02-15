@@ -4,11 +4,13 @@ message::message()
 {
     this->min = 0;
     this->max = 255;
+    this->middle = 0.5;
 }
 
-message::message(int min, int max){
+message::message(int min, int max, double middle){
     this->min = min;
     this->max = max;
+    this->middle = middle;
 }
 
 bool message::getReset()
@@ -20,9 +22,19 @@ int message::getMin(){
     return this->min;
 }
 
+double message::getMiddle()
+{
+    return this->middle;
+}
+
 void message::setReset(bool status)
 {
     this->reset = status;
+}
+
+void message::setMiddle(int middle)
+{
+    this->middle = static_cast<double>(middle/255.0);
 }
 
 int message::getMax(){

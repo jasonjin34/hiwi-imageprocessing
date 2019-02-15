@@ -34,6 +34,8 @@ private slots:
     void on_minIntensity_valueChanged(int arg1);
 
 
+    void on_verticalMiddle_valueChanged(int value);
+
 private:
     Ui::window_histmatching *ui;
     cv::Mat input;

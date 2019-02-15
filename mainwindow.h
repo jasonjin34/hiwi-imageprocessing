@@ -34,7 +34,7 @@ class MainWindow : public QMainWindow
     QGraphicsView   m_view;
     cv::Mat         m_image;
     cv::Mat         m_result;
-    cv::Mat         m_refer; //reference image for hisMatch
+    bool Equlizationdivide;
 
 
 public:

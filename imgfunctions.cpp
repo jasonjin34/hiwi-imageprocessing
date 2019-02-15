@@ -80,45 +80,85 @@ void histEqual(cv::Mat& input, cv::Mat& output)
 }
 
 //histogram equalization for level adjustment gui
-void histEqual_leveladj(cv::Mat& input,cv::Mat& output, int min, int max, bool equalization)
+/**
+ * @brief histEqual_leveladj
+ * @param input
+ * @param output
+ * @param min minimal pixel intensity value
+ * @param middle set up the two different sub-range, each range will be assigned 50% pixel intensity values
+ * @param max maxiaml pixel intensity value
+ * @param equalization
+ */
+void histEqual_leveladj(cv::Mat& input,cv::Mat& output, int min,double middle, int max, bool equalization, bool equldivide)
 {
     int range = max - min;
     int histogram[256];
+
+    int range_upper = static_cast<int>(range*middle);
+    int range_under = range - range_upper;
+
     imageHist(input,histogram);
 
     int size = input.rows*input.cols;
     float alpha = static_cast<float>(range)/size;
 
-    float proIntensity[256];
-    for(int i = 0;i < 256;i++){
-        proIntensity[i] = static_cast<float>(histogram[i]) / size; // size = total image pixels
-    }
+    float alpha_upper = static_cast<float>(range_upper*2.0/size);
+    float alpha_under = static_cast<float>(range_under*2.0/size);
 
     if(equalization)
     {
-        int cumhistogram[256];
-        cumhist(histogram,cumhistogram);
+        if(equldivide == false)
+        {
+            int cumhistogram[256];
+            cumhist(histogram,cumhistogram);
 
-        //Scale the histogram with equalization
-        int scale_his[256];
-        for(int i= 0; i <256; i++) scale_his[i] = 0;
-        for(int i = min; i < max; i++){
-            scale_his[i] = cvRound(static_cast<float>(cumhistogram[i])*alpha);
+            //Scale the histogram with equalization
+            int scale_his[256];
+            for(int i= 0; i <256; i++) scale_his[i] = 0;
+            for(int i = 0; i < 255; i++){
+                scale_his[i] = cvRound(static_cast<float>(cumhistogram[i])*alpha + min);
+            }
+
+            cv::Mat temp = input.clone();
+            for(int y = 0; y < input.rows ; y++)
+                for(int x = 0; x < input.cols; x++)
+                    temp.at<uchar>(y,x) = cv::saturate_cast<uchar>(scale_his[input.at<uchar>(y,x)]);
+            output = temp;
+        }
+        else
+        {
+            int cumhistogram[256];
+            cumhist(histogram,cumhistogram);
+
+            //Scale the histogram with equalization
+            int scale_his[256];
+            for(int i= 0; i <256; i++) scale_his[i] = 0;
+            for(int i = 0; i < 128; i++){
+                scale_his[i] = cvRound(static_cast<float>(cumhistogram[i])*alpha_upper + min);
+            }
+
+            for(int i = 128; i < 255; i++){
+               scale_his[i] = cvRound(static_cast<float>((cumhistogram[i])-cumhistogram[127])*alpha_under + min + range_upper);
+            }
+
+            cv::Mat temp = input.clone();
+            for(int y = 0; y < input.rows ; y++)
+                for(int x = 0; x < input.cols; x++)
+                    temp.at<uchar>(y,x) = cv::saturate_cast<uchar>(scale_his[input.at<uchar>(y,x)]);
+            output = temp;
         }
 
-        cv::Mat temp = input.clone();
-        for(int y = 0; y < input.rows ; y++)
-            for(int x = 0; x < input.cols; x++)
-                temp.at<uchar>(y,x) = cv::saturate_cast<uchar>(scale_his[input.at<uchar>(y,x)]);
-        output = temp;
     }
     else
     {
-        //Scale the histogram without equalization
+        //Scale the histogram pixel value without equalization
         int scale_his[256];
-        for(int i= 0; i <256; i++) scale_his[i] = 0;
-        for(int i = min; i < max; i++){
-            scale_his[i] = cvRound(static_cast<double>(i*range/255)+min);
+        for(int i= 0; i <256; i++) scale_his[i] = 0; // Scale  vector init
+        for(int i = 0; i < 127; i++){
+            scale_his[i] = cvRound(static_cast<double>(2.0*i*range_upper/255.0)+min); // set up 50 pixel in the upper range
+        }
+        for(int i = 127; i < 255; i++){
+            scale_his[i] = cvRound(static_cast<double>(2.0*(i-127)*range_under/255.0)+range_upper+min);
         }
 
         cv::Mat temp = input.clone();

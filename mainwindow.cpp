@@ -56,7 +56,7 @@ void MainWindow::onMessageSent(message message_signal){
     m_scene_res.clear();
     m_result = m_image.clone();
     //histogram equalization: level adjustment GUI
-    iaw::histEqual_leveladj(m_result,m_result, message_signal.getMin(), message_signal.getMax(),ui->optHisMatching->isChecked());
+    iaw::histEqual_leveladj(m_result,m_result, message_signal.getMin(),message_signal.getMiddle(), message_signal.getMax(),ui->optHisMatching->isChecked()||ui->optHisEqudivide->isChecked(),Equlizationdivide);
     hismatchinggui->setoutput(m_result);
 
     m_scene_res.addPixmap(QPixmap::fromImage(Mat2QImageGrayscale(m_result)));
@@ -118,6 +118,7 @@ void MainWindow::transform()
         if(ui->optHisEqual->isChecked()) {
             iaw::histEqual(m_result, m_result);
         } else if(ui->optHisMatching->isChecked() || ui->optHisMatchingnoEqu->isChecked()) {
+            Equlizationdivide = false;
             if(!hismatchinggui)
             {
                 hismatchinggui = new window_histmatching;
@@ -130,6 +131,16 @@ void MainWindow::transform()
             iaw::histClahe(m_result, m_result);
         } else if(ui->optHistogramDraw->isChecked()){
             iaw::histDraw(m_result,m_result,0,255);
+        } else if(ui->optHisEqudivide->isChecked()){
+            Equlizationdivide = true;
+            if(!hismatchinggui)
+            {
+                hismatchinggui = new window_histmatching;
+                hismatchinggui->setinput(m_result);
+
+                connect(hismatchinggui, &window_histmatching::notifyMessageSent,this,&MainWindow::onMessageSent);
+            }
+            hismatchinggui->show();
         }
     }
 
@@ -164,4 +175,8 @@ void MainWindow::on_resetbutton_clicked()
 {
     m_result = m_image.clone();
     m_scene_res.addPixmap(QPixmap::fromImage(Mat2QImageGrayscale(m_result)));
+    if(hismatchinggui != nullptr)
+    {
+        hismatchinggui->setinput(m_result);
+    }
 }

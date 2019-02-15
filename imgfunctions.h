@@ -31,7 +31,7 @@ void threshold_otsu(cv::Mat& input, cv::Mat& output);
 
 void histEqual(cv::Mat& input, cv::Mat& output);
 
-void histEqual_leveladj(cv::Mat& input,cv::Mat& output, int min, int max, bool equalization);
+void histEqual_leveladj(cv::Mat& input,cv::Mat& output, int min,double middle, int max, bool equalization, bool equdivider);
 
 void histDraw(cv::Mat& input,cv::Mat& output,int min, int max);
 
