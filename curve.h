@@ -15,7 +15,8 @@ public:
     explicit Curve(QWidget *parent = nullptr);
     ~Curve();
 
-    void addPoint(double x, double y);
+    bool addPoint(double x, double y);
+    void updatePoint(double x, double y);
     void clearData();
     void plot();
 signals:
