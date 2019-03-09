@@ -23,6 +23,7 @@ signals:
 
 private slots:
     void clickedGraph(QMouseEvent *event);
+    void mousePosition(QMouseEvent *event);
     void on_button_clear_clicked();
     double interpolation(double x);
     void on_x_point1_valueChanged(double arg1);

@@ -162,7 +162,7 @@ void MainWindow::transform()
 void MainWindow::on_actionCurve_triggered()
 {
     if(!m_image.empty()) {
-        curvegui = new Curve;
+        curvegui = new Curve();
         curvegui->show();
         connect(curvegui,&Curve::notifyMessageSentCurve, this, &MainWindow::onMessageSentCurve);
     } else {
