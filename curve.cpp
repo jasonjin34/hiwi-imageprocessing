@@ -171,7 +171,7 @@ void Curve::mousePosition(QMouseEvent *event)
 
     if(event->buttons() & Qt::LeftButton)
     {
-        if(qv_x.size() <= ui->numInterpolation->text().toInt() + 1)
+        if(qv_x.size() <= ui->numInterpolation->text().toInt() + 2)
         {
             if(qv_x[0] != 1.0){
                 qv_y.push_front(1.0);
