@@ -16,7 +16,20 @@ public:
     ~Curve();
 
     bool addPoint(double x, double y);
+    /**
+     * @brief updatePoint update the last point
+     * @param x coordinate position
+     * @param y coordinate position
+     */
     void updatePoint(double x, double y);
+    /**
+     * @brief aroundPoint check if the curror is around the current exsiting point
+     * @param x
+     * @param y
+     */
+    bool aroundPoint(double x, double y);
+    void deletePoint(double x, double y);
+    void updateGraph();
     void clearData();
     void plot();
 signals:

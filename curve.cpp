@@ -68,11 +68,71 @@ bool Curve::addPoint(double x, double y)
 
 void Curve::updatePoint(double x, double y)
 {
-     int x_position = qv_x.size() - 2;
-     int y_position = qv_y.size() -2;
-     qv_x[x_position] = x;
-     qv_y[y_position] = y;
+    QVector<double>::iterator it_x, it_y;
+    for(it_x = qv_x.begin(),it_y = qv_y.begin();it_x < qv_x.end();++it_x,++it_y)
+    {
+        //check if the cursor position with radius 5
+        if(sqrt((*it_x-x)*(*it_x-x)+(*it_y-y)*(*it_y-y)) < 8)
+        {
+            *it_x = x;
+            *it_y = y;
+        }
+    }
+}
 
+bool Curve::aroundPoint(double x, double y)
+{
+    QVector<double>::iterator it_x, it_y;
+    for(it_x = qv_x.begin(),it_y = qv_y.begin();it_x < qv_x.end();++it_x,++it_y)
+    {
+        //check if the cursor position with radius 5
+        if(sqrt((*it_x-x)*(*it_x-x)+(*it_y-y)*(*it_y-y)) < 8)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+void Curve::deletePoint(double x, double y)
+{
+    if(aroundPoint(x,y))
+    {
+        QVector<double>::iterator it_x, it_y;
+        int temp_position = 0;
+        for(it_x = qv_x.begin(),it_y = qv_y.begin();it_x < qv_x.end();++it_x,++it_y)
+        {
+            //check if the cursor position with radius 5
+            if(sqrt((*it_x-x)*(*it_x-x)+(*it_y-y)*(*it_y-y)) < 8)
+            {
+               qv_x.remove(temp_position);
+               qv_y.remove(temp_position);
+            }
+            ++temp_position;
+        }
+    }
+}
+
+void Curve::updateGraph()
+{
+    ui->x_point1->setValue(qv_x.front());
+    ui->y_point1->setValue(qv_y.front());
+    ui->x_point2->setValue(qv_x.back());
+    ui->y_point2->setValue(qv_y.back());
+
+    QVector<double> image_interoplation_y;
+    QVector<double> image_interoplation_x;
+    for(int i = 1; i < 255; i++)
+    {
+        image_interoplation_y.append(interpolation(static_cast<double>(i)) > 255 ? 255:interpolation(static_cast<double>(i)));
+        image_interoplation_x.append(i);
+    }
+    ui->curve_plot->graph(0)->setData(image_interoplation_x,image_interoplation_y);
+    ui->curve_plot->graph(2)->setData(qv_x,qv_y);
+    ui->curve_plot->replot();
+    ui->curve_plot->update();
+    message_singal_curve.setalphafactor(image_interoplation_y);
+    emit notifyMessageSentCurve(message_singal_curve);
 }
 
 void Curve::clearData()
@@ -135,36 +195,31 @@ void Curve::clickedGraph(QMouseEvent *event)
         qv_x.push_front(1.0);
         qv_x.append(255.0);
     }
-
-    if(addPoint(x_value,y_value))
+    if(event->buttons() & Qt::LeftButton)
     {
-        ui->x_point1->setValue(qv_x.front());
-        ui->y_point1->setValue(qv_y.front());
-        ui->x_point2->setValue(qv_x.back());
-        ui->y_point2->setValue(qv_y.back());
-
-        QVector<double> image_interoplation_y;
-        QVector<double> image_interoplation_x;
-        for(int i = 1; i < 255; i++)
+        if(!aroundPoint(x_value,y_value))
         {
-            image_interoplation_y.append(interpolation(static_cast<double>(i)) > 255 ? 255:interpolation(static_cast<double>(i)));
-            image_interoplation_x.append(i);
+            if(addPoint(x_value,y_value))
+            {
+                updateGraph();
+            }
+            else
+            {
+                QMessageBox::warning(this, "Interpolation Points Warning","reach to the max number of points");
+            }
         }
-        ui->curve_plot->graph(0)->setData(image_interoplation_x,image_interoplation_y);
-        ui->curve_plot->replot();
-        ui->curve_plot->update();
-        message_singal_curve.setalphafactor(image_interoplation_y);
-        emit notifyMessageSentCurve(message_singal_curve);
     }
-    else
+    else if(event->buttons() & Qt::RightButton)
     {
-        QMessageBox::warning(this, "Interpolation Points Warning","reach to the max number of points");
+        deletePoint(x_value,y_value);
+        updateGraph();
     }
 }
 
 void Curve::mousePosition(QMouseEvent *event)
 {
     QPoint point = event->pos();
+    //get the current cursor poistion
     double x_value = ui->curve_plot->xAxis->pixelToCoord((point.x()));
     double y_value = ui->curve_plot->yAxis->pixelToCoord((point.y()));
     ui->CurrentPosition->setText(QString("%1,%2").arg(static_cast<int>(x_value)).arg(static_cast<int>(y_value)));
@@ -181,25 +236,7 @@ void Curve::mousePosition(QMouseEvent *event)
             }
             if(qv_x.size() <= 2) addPoint(x_value,y_value);
             else updatePoint(x_value,y_value);
-
-            ui->x_point1->setValue(qv_x.front());
-            ui->y_point1->setValue(qv_y.front());
-            ui->x_point2->setValue(qv_x.back());
-            ui->y_point2->setValue(qv_y.back());
-
-            QVector<double> image_interoplation_y;
-            QVector<double> image_interoplation_x;
-            for(int i = 1; i < 255; i++)
-            {
-                image_interoplation_y.append(interpolation(static_cast<double>(i)) > 255 ? 255:(interpolation(static_cast<double>(i)) <= 0 ? 0:interpolation(static_cast<double>(i))));
-                image_interoplation_x.append(i);
-            }
-            ui->curve_plot->graph(0)->setData(image_interoplation_x,image_interoplation_y);
-            ui->curve_plot->graph(2)->setData(qv_x,qv_y);
-            ui->curve_plot->replot();
-            ui->curve_plot->update();
-            message_singal_curve.setalphafactor(image_interoplation_y);
-            emit notifyMessageSentCurve(message_singal_curve);
+            updateGraph();
         }
         else
         {
