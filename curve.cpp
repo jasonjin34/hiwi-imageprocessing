@@ -69,15 +69,36 @@ bool Curve::addPoint(double x, double y)
 void Curve::updatePoint(double x, double y)
 {
     QVector<double>::iterator it_x, it_y;
+    QVector<double> vector_distance;
+    QVector<int> vector_position;
+    int temp_position = 0;
     for(it_x = qv_x.begin(),it_y = qv_y.begin();it_x < qv_x.end();++it_x,++it_y)
     {
-        //check if the cursor position with radius 5
-        if(sqrt((*it_x-x)*(*it_x-x)+(*it_y-y)*(*it_y-y)) < 8)
+        //check if the cursor position with radius 35
+        double distance = sqrt((*it_x-x)*(*it_x-x)+(*it_y-y)*(*it_y-y));
+        if(distance < 35)
         {
-            *it_x = x;
-            *it_y = y;
+           //get all the point around the cursor only update the nearest one
+           vector_distance.append(distance);
+           vector_position.append(temp_position);
+        }
+        ++temp_position;
+    }
+    double distance_min = vector_distance[0];
+    int vector_distance_index = 0;
+    for(int i = 0; i < vector_distance.size(); i++)
+    {
+        if(vector_distance[i] < distance_min)
+        {
+             distance_min = vector_distance[i];
+             vector_distance_index = i;
         }
     }
+
+    //update the nearest point
+    qv_x[vector_position[vector_distance_index]] = x;
+    qv_y[vector_position[vector_distance_index]] = y;
+
 }
 
 bool Curve::aroundPoint(double x, double y)
@@ -85,7 +106,7 @@ bool Curve::aroundPoint(double x, double y)
     QVector<double>::iterator it_x, it_y;
     for(it_x = qv_x.begin(),it_y = qv_y.begin();it_x < qv_x.end();++it_x,++it_y)
     {
-        //check if the cursor position with radius 5
+        //check if the cursor position with radius 8
         if(sqrt((*it_x-x)*(*it_x-x)+(*it_y-y)*(*it_y-y)) < 8)
         {
             return true;
@@ -103,7 +124,7 @@ void Curve::deletePoint(double x, double y)
         for(it_x = qv_x.begin(),it_y = qv_y.begin();it_x < qv_x.end();++it_x,++it_y)
         {
             //check if the cursor position with radius 5
-            if(sqrt((*it_x-x)*(*it_x-x)+(*it_y-y)*(*it_y-y)) < 8)
+            if(sqrt((*it_x-x)*(*it_x-x)+(*it_y-y)*(*it_y-y)) < 5)
             {
                qv_x.remove(temp_position);
                qv_y.remove(temp_position);
@@ -124,7 +145,8 @@ void Curve::updateGraph()
     QVector<double> image_interoplation_x;
     for(int i = 1; i < 255; i++)
     {
-        image_interoplation_y.append(interpolation(static_cast<double>(i)) > 255 ? 255:interpolation(static_cast<double>(i)));
+        double current_value = interpolation(static_cast<double>(i));
+        image_interoplation_y.append(current_value > 255 ? 255:(current_value < 0 ? 0:current_value));
         image_interoplation_x.append(i);
     }
     ui->curve_plot->graph(0)->setData(image_interoplation_x,image_interoplation_y);
