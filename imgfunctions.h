@@ -1,9 +1,11 @@
 #pragma once
 
+#include <qstringlist.h>
 #include <opencv2/opencv.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/types_c.h>
+#include <opencv2/stitching.hpp>
 #include <QVector>
 
 namespace iaw
@@ -47,4 +49,7 @@ void contrastAdjustment(cv::Mat& input, cv::Mat& output, double alpha, double be
 
 void contrastAdjInterpolation(cv::Mat& input, cv::Mat& output, QVector<double>);
 
+void imageStitching(std::vector<cv::Mat>& input, cv::Mat& output);
+
+void loadImagevector(QStringList& inputfiles,std::vector<cv::Mat>& output);
 }

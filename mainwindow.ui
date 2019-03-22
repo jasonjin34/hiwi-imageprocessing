@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>947</width>
-    <height>702</height>
+    <width>1007</width>
+    <height>724</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -381,7 +381,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>947</width>
+     <width>1007</width>
      <height>21</height>
     </rect>
    </property>
@@ -398,8 +398,15 @@
     <addaction name="separator"/>
     <addaction name="actionCurve"/>
    </widget>
+   <widget class="QMenu" name="menuImage_Stitching">
+    <property name="title">
+     <string>Image Stitching</string>
+    </property>
+    <addaction name="actionLanuch"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuCurve"/>
+   <addaction name="menuImage_Stitching"/>
   </widget>
   <action name="actionSearch">
    <property name="text">
@@ -409,6 +416,11 @@
   <action name="actionCurve">
    <property name="text">
     <string>Curve</string>
+   </property>
+  </action>
+  <action name="actionLanuch">
+   <property name="text">
+    <string>Lanuch</string>
    </property>
   </action>
  </widget>

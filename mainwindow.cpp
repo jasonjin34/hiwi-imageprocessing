@@ -180,3 +180,10 @@ void MainWindow::on_resetbutton_clicked()
         hismatchinggui->setinput(m_result);
     }
 }
+
+void MainWindow::on_actionLanuch_triggered()
+{
+    stitchinggui = new Image_stitching();
+    stitchinggui->show();
+
+}
