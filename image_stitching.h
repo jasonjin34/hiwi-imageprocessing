@@ -14,15 +14,13 @@ class Image_stitching;
 class Image_stitching : public QDialog
 {
     Q_OBJECT
-    QGraphicsScene stitching_result;
-    QGraphicsView stitching_view;
+    QGraphicsScene stitching_result,inputView1,inputView2,inputView3;
 
 public:
     explicit Image_stitching(QWidget *parent = nullptr);
     ~Image_stitching();
 
 private slots:
-
 
     void on_transf_button_clicked();
 
