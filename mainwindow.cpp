@@ -187,3 +187,8 @@ void MainWindow::on_actionLanuch_triggered()
     stitchinggui->show();
 
 }
+
+void MainWindow::on_actionStitching_Contour_triggered()
+{
+
+}

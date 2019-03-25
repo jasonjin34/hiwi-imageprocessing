@@ -265,5 +265,11 @@ void loadImagevector(QStringList& inputfiles, std::vector<cv::Mat> &output)
     output = imageVector;
 }
 
+void threshold_imagestitching(cv::Mat &input, cv::Mat &output)
+{
+    cv::cvtColor(input,input,CV_BGR2GRAY);
+    cv::threshold(input,output,0,240,CV_THRESH_BINARY );
+}
+
 
 }

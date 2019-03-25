@@ -28,9 +28,13 @@ private slots:
 
     void on_searchImage_stitching_clicked();
 
+    void on_saveImage_button_clicked();
+
 private:
     Ui::Image_stitching *ui;
     QStringList files;
+    QImage* result;
+    cv::Mat result_save;
 };
 
 #endif // IMAGE_STITCHING_H

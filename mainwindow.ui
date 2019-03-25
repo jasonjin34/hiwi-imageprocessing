@@ -403,6 +403,7 @@
      <string>Image Stitching</string>
     </property>
     <addaction name="actionLanuch"/>
+    <addaction name="actionStitching_Contour"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuCurve"/>
@@ -421,6 +422,11 @@
   <action name="actionLanuch">
    <property name="text">
     <string>Lanuch</string>
+   </property>
+  </action>
+  <action name="actionStitching_Contour">
+   <property name="text">
+    <string>Stitching Contour </string>
    </property>
   </action>
  </widget>

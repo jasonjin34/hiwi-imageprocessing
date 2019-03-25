@@ -34,6 +34,7 @@ void Image_stitching::on_transf_button_clicked()
     cv::Mat result;
     iaw::loadImagevector(files,imageVector_pano);
     iaw::imageStitching(imageVector_pano,result);
+    this->result_save = result; //use to save the original stitched image
 
     //set image
     cv::Mat temp;
@@ -41,6 +42,43 @@ void Image_stitching::on_transf_button_clicked()
     QImage dest(temp.data,temp.cols,temp.rows,static_cast<int>(temp.step),QImage::Format_RGB888);
     QImage destscaled = dest.scaled(1000,1000,Qt::KeepAspectRatio,Qt::SmoothTransformation);
     stitching_result.addPixmap(QPixmap::fromImage(destscaled));
+    this->result = &destscaled;
+
+    /**
+
+    //countor of the stitiched image and find the largest contour in the threshold image
+    //use the contor as mask of stitiching image
+
+    cv::Mat result_thr;
+    iaw::threshold_imagestitching(result,result_thr);
+    std::vector<std::vector<cv::Point>> contours;
+    std::vector<cv::Vec4i> hierarchy;
+
+    cv::Mat dst(result_thr.rows,result_thr.cols,CV_8UC3,cv::Scalar::all(0));
+    cv::findContours(result_thr,contours,hierarchy,CV_RETR_EXTERNAL,cv::CHAIN_APPROX_SIMPLE);
+
+    double largest_area = 0;
+    int largest_contour_index = 0;
+    cv::Rect bounding_rect;
+
+    for(int i = 0; i < static_cast<int>(contours.size());++i)
+    {
+        double a = cv::contourArea(contours[static_cast<unsigned long long>(i)],false);
+        if( a > largest_area)
+        {
+            largest_area = a;
+            largest_contour_index = i;
+            bounding_rect = cv::boundingRect(contours[static_cast<unsigned long long>(i)]);
+        }
+
+    }
+    cv::Scalar color(255,255,255);
+    cv::drawContours(dst,contours,largest_contour_index,color,CV_FILLED,8,hierarchy);
+    cv::rectangle(result,bounding_rect,cv::Scalar(0,255,0),10,8,0);
+    QImage dest_test(dst.data,dst.cols,dst.rows,static_cast<int>(dst.step),QImage::Format_RGB888);
+    QImage destscaled_test = dest.scaled(1000,1000,Qt::KeepAspectRatio,Qt::SmoothTransformation);
+    stitching_result.addPixmap(QPixmap::fromImage(destscaled_test));
+    **/
 }
 
 void Image_stitching::on_closeGUI_clicked()
@@ -80,4 +118,14 @@ void Image_stitching::on_searchImage_stitching_clicked()
     inputView1.addPixmap(QPixmap::fromImage(qImageVector[0]));
     inputView2.addPixmap(QPixmap::fromImage(qImageVector[1]));
     inputView3.addPixmap(QPixmap::fromImage(qImageVector[2]));
+}
+
+
+void Image_stitching::on_saveImage_button_clicked()
+{
+    QString fileName = QFileDialog::getSaveFileName(this,
+                                                    tr("Save Image File"),
+                                                    "C:/HIWI/images",
+                                                    tr("Images(*.png *.xpm *.jpg)"));
+    cv::imwrite(fileName.toStdString(),this->result_save);
 }

@@ -58,6 +58,8 @@ private slots:
 
     void on_actionLanuch_triggered();
 
+    void on_actionStitching_Contour_triggered();
+
 private:
     void transform();
 };

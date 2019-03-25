@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1082</width>
-    <height>732</height>
+    <width>1074</width>
+    <height>722</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -19,7 +19,7 @@
   <property name="windowTitle">
    <string>Image Stitching</string>
   </property>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>20</x>
@@ -90,7 +90,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>20</x>
@@ -125,17 +125,24 @@
         </property>
        </spacer>
       </item>
-      <item row="0" column="1">
-       <widget class="QPushButton" name="transf_button">
+      <item row="0" column="4">
+       <widget class="QPushButton" name="closeGUI">
         <property name="text">
-         <string>Stitching</string>
+         <string>Close</string>
         </property>
        </widget>
       </item>
       <item row="0" column="2">
-       <widget class="QPushButton" name="closeGUI">
+       <widget class="QPushButton" name="saveImage_button">
         <property name="text">
-         <string>Close</string>
+         <string>Save</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QPushButton" name="transf_button">
+        <property name="text">
+         <string>Stitching</string>
         </property>
        </widget>
       </item>

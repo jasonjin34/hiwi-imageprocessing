@@ -52,4 +52,6 @@ void contrastAdjInterpolation(cv::Mat& input, cv::Mat& output, QVector<double>);
 void imageStitching(std::vector<cv::Mat>& input, cv::Mat& output);
 
 void loadImagevector(QStringList& inputfiles,std::vector<cv::Mat>& output);
+
+void threshold_imagestitching(cv::Mat& input, cv::Mat& output);
 }
