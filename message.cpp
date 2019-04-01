@@ -5,6 +5,7 @@ message::message()
     this->min = 0;
     this->max = 255;
     this->middle = 0.5;
+    this->processing = false;
 }
 
 message::message(int min, int max, double middle){
@@ -87,4 +88,14 @@ void message::clearMessage()
     this->setMin(0);
     alphafactor.clear();
     this->setReset(false);
+}
+
+bool message::getProcessing()
+{
+    return this->processing;
+}
+
+void message::setProcessing(bool status)
+{
+    this->processing = status;
 }

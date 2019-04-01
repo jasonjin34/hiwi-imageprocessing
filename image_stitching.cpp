@@ -6,6 +6,19 @@
 #include <opencv2/imgproc/types_c.h>
 #include <QFileDialog>
 #include <QDebug>
+#include <QTime>
+#include <QString>
+#include <QGraphicsItem>
+#include <QGraphicsProxyWidget>
+#include <QMessageBox>
+#include <QThread>
+#include <QFuture>
+#include <QTime>
+#include <QtConcurrent>
+#include "thread_loading.h"
+#include "thread_stitching_transfer.h"
+
+message status_message;
 
 Image_stitching::Image_stitching(QWidget *parent) :
     QDialog(parent),
@@ -18,9 +31,8 @@ Image_stitching::Image_stitching(QWidget *parent) :
     ui->inputView3->setScene(&inputView3);
 
     connect(ui->closeGUI, SIGNAL(clicked()), this, SLOT(on_closeGUI_clicked()));
-    connect(ui->transf_button,SIGNAL(clicked()),this,SLOT(on_transf_button_clicked()));
-    //connect(ui->searchImage_stitching,SIGNAL(clicked()),this,SLOT(on_searchImage_stitching_clicked()));
-
+    connect(this,&Image_stitching::notifyMessageProcessing,this,&Image_stitching::onMessageProcessing);
+    //connect(ui->transf_button,SIGNAL(clicked()),this,SLOT(on_transf_button_clicked()));
 }
 
 Image_stitching::~Image_stitching()
@@ -28,57 +40,79 @@ Image_stitching::~Image_stitching()
     delete ui;
 }
 
+void Image_stitching::transfer_function()
+{
+     std::vector<cv::Mat> imageVector_pano;
+     cv::Mat result;
+     iaw::loadImagevector(files,imageVector_pano);
+     iaw::imageStitching(imageVector_pano,result);
+     this->result_save = result; //use to save the original stitched image
+
+     //set image
+     cv::Mat temp;
+     cv::cvtColor(result,temp,CV_BGR2RGB);
+     QImage dest(temp.data,temp.cols,temp.rows,static_cast<int>(temp.step),QImage::Format_RGB888);
+     QImage destscaled = dest.scaled(1000,1000,Qt::KeepAspectRatio,Qt::SmoothTransformation);
+     stitching_result.addPixmap(QPixmap::fromImage(destscaled));
+     this->result = &destscaled;
+     ui->status_label->setText("finish");
+}
+
+void Image_stitching::transfer_processing_function()
+{
+    on_transf_processing();
+}
+
+
+//TO DO Multithread
+void Image_stitching::onMessageProcessing(message message_processing)
+{
+    on_transf_processing();
+    if(message_processing.getProcessing() == true)
+    {
+       ui->status_label->setText("Image Processing ... ");
+       transfer_function();
+
+       /**
+       Thread_loading Tfirst(this,"loading");
+       Thread_loading Tsecond(this,"transfer");
+       Tfirst.start();
+       Tsecond.start();
+       Tfirst.wait();
+       Tsecond.wait();
+       */
+    }
+}
+
+
+void Image_stitching::on_transf_processing()
+{
+    bool b_test = false;
+    if(b_test == true)
+    {
+        this->gif_anim = new QLabel();
+        this->movie = new QMovie("C:/HIWI/hiwi_test_final/loading_image/loading_small.gif");
+        this->gif_anim->setMovie(movie);
+        this->movie->start();
+        stitching_result.addWidget(gif_anim);
+        ui->status_label->setText("proccesing ... ");
+    }
+    else {
+        QImage loading_image;
+        loading_image.load("C:/HIWI/hiwi_test_final/loading_image/loadingpng.png");
+        stitching_result.addPixmap(QPixmap::fromImage(loading_image));
+        inputView1.addPixmap(QPixmap::fromImage(loading_image));
+        inputView2.addPixmap(QPixmap::fromImage(loading_image));
+        inputView3.addPixmap(QPixmap::fromImage(loading_image));
+        qDebug() << "loading";
+        ui->status_label->setText("proccesing ... ");
+        ui->status_label->setText("proccesing ... ");
+    }
+}
+
 void Image_stitching::on_transf_button_clicked()
 {
-    std::vector<cv::Mat> imageVector_pano;
-    cv::Mat result;
-    iaw::loadImagevector(files,imageVector_pano);
-    iaw::imageStitching(imageVector_pano,result);
-    this->result_save = result; //use to save the original stitched image
-
-    //set image
-    cv::Mat temp;
-    cv::cvtColor(result,temp,CV_BGR2RGB);
-    QImage dest(temp.data,temp.cols,temp.rows,static_cast<int>(temp.step),QImage::Format_RGB888);
-    QImage destscaled = dest.scaled(1000,1000,Qt::KeepAspectRatio,Qt::SmoothTransformation);
-    stitching_result.addPixmap(QPixmap::fromImage(destscaled));
-    this->result = &destscaled;
-
-    /**
-
-    //countor of the stitiched image and find the largest contour in the threshold image
-    //use the contor as mask of stitiching image
-
-    cv::Mat result_thr;
-    iaw::threshold_imagestitching(result,result_thr);
-    std::vector<std::vector<cv::Point>> contours;
-    std::vector<cv::Vec4i> hierarchy;
-
-    cv::Mat dst(result_thr.rows,result_thr.cols,CV_8UC3,cv::Scalar::all(0));
-    cv::findContours(result_thr,contours,hierarchy,CV_RETR_EXTERNAL,cv::CHAIN_APPROX_SIMPLE);
-
-    double largest_area = 0;
-    int largest_contour_index = 0;
-    cv::Rect bounding_rect;
-
-    for(int i = 0; i < static_cast<int>(contours.size());++i)
-    {
-        double a = cv::contourArea(contours[static_cast<unsigned long long>(i)],false);
-        if( a > largest_area)
-        {
-            largest_area = a;
-            largest_contour_index = i;
-            bounding_rect = cv::boundingRect(contours[static_cast<unsigned long long>(i)]);
-        }
-
-    }
-    cv::Scalar color(255,255,255);
-    cv::drawContours(dst,contours,largest_contour_index,color,CV_FILLED,8,hierarchy);
-    cv::rectangle(result,bounding_rect,cv::Scalar(0,255,0),10,8,0);
-    QImage dest_test(dst.data,dst.cols,dst.rows,static_cast<int>(dst.step),QImage::Format_RGB888);
-    QImage destscaled_test = dest.scaled(1000,1000,Qt::KeepAspectRatio,Qt::SmoothTransformation);
-    stitching_result.addPixmap(QPixmap::fromImage(destscaled_test));
-    **/
+    transfer_function();
 }
 
 void Image_stitching::on_closeGUI_clicked()
@@ -88,6 +122,12 @@ void Image_stitching::on_closeGUI_clicked()
 
 void Image_stitching::on_searchImage_stitching_clicked()
 {
+    stitching_result.clear();
+    inputView1.clear();
+    inputView2.clear();
+    inputView3.clear();
+
+    on_transf_processing();
     QStringList tempFiles;
     if(tempFiles.isEmpty()){
        tempFiles = QFileDialog::getOpenFileNames(
@@ -98,26 +138,35 @@ void Image_stitching::on_searchImage_stitching_clicked()
                     );
        this->files = tempFiles;
     }
-    else qDebug()<<"error";
-    QString output;
-    for(int i = 0; i < tempFiles.size(); ++i){
-        output = output + tempFiles[i];
-    }
-    ui->imageFile_stitching->setText(output);
-    std::vector<cv::Mat> imageVector_pano;
-    iaw::loadImagevector(tempFiles,imageVector_pano);
-    QVector<QImage> qImageVector;
-    for(int i = 0; i < static_cast<int>(imageVector_pano.size());++i)
+    else qDebug()<<"loading image error";
+
+    //load at least 2 images
+    if(tempFiles.length() >= 3)
     {
-        cv::Mat temp;
-        cv::cvtColor(imageVector_pano[static_cast<unsigned long long>(i)],temp,CV_BGR2RGB);
-        QImage dest(temp.data,temp.cols,temp.rows,static_cast<int>(temp.step),QImage::Format_RGB888);
-        QImage destscaled = dest.scaled(341,176,Qt::IgnoreAspectRatio,Qt::SmoothTransformation);
-        qImageVector.append(destscaled);
+        QString output;
+        for(int i = 0; i < tempFiles.size(); ++i){
+            output = output + tempFiles[i];
+        }
+        ui->imageFile_stitching->setText(output);
+        std::vector<cv::Mat> imageVector_pano;
+        iaw::loadImagevector(tempFiles,imageVector_pano);
+        QVector<QImage> qImageVector;
+        for(int i = 0; i < static_cast<int>(imageVector_pano.size());++i)
+        {
+            cv::Mat temp;
+            cv::cvtColor(imageVector_pano[static_cast<unsigned long long>(i)],temp,CV_BGR2RGB);
+            QImage dest(temp.data,temp.cols,temp.rows,static_cast<int>(temp.step),QImage::Format_RGB888);
+            QImage destscaled = dest.scaled(341,176,Qt::IgnoreAspectRatio,Qt::SmoothTransformation);
+            qImageVector.append(destscaled);
+        }
+        inputView1.addPixmap(QPixmap::fromImage(qImageVector[0]));
+        inputView2.addPixmap(QPixmap::fromImage(qImageVector[1]));
+        inputView3.addPixmap(QPixmap::fromImage(qImageVector[2]));
+        transfer_function();
     }
-    inputView1.addPixmap(QPixmap::fromImage(qImageVector[0]));
-    inputView2.addPixmap(QPixmap::fromImage(qImageVector[1]));
-    inputView3.addPixmap(QPixmap::fromImage(qImageVector[2]));
+    else {
+        QMessageBox::critical(this,"Image Loading error","need more images");
+    }
 }
 
 

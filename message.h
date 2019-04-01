@@ -23,12 +23,14 @@ public:
     double getbeta();
     QVector<double> getalphaptr();
     void clearMessage();
+    bool getProcessing();
+    void setProcessing(bool);
 
 private:
     double middle;
     int max;
     int min;
-    bool reset;
+    bool reset,processing;
     double alpha_min;
     double alpha_max;
     QVector<double> alphafactor;

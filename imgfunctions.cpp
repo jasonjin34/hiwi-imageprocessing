@@ -240,16 +240,18 @@ void contrastAdjInterpolation(cv::Mat &input, cv::Mat &output, QVector<double> a
     }
 }
 
-void imageStitching(std::vector<cv::Mat> &input, cv::Mat &output)
+bool imageStitching(std::vector<cv::Mat> &input, cv::Mat &output)
 {
     cv::Stitcher::Mode mode = cv::Stitcher::PANORAMA;
     cv::Mat pano;
-    cv::Ptr<cv::Stitcher> stitcher = cv::Stitcher::create(mode, false);
+    cv::Ptr<cv::Stitcher> stitcher = cv::Stitcher::create(mode);
     cv::Stitcher::Status status = stitcher->stitch(input,pano);
     if(status != cv::Stitcher::OK){
         qDebug() << "Can't stitch images\n";
+        return false;
     }
     output = pano;
+    return true;
 }
 
 void loadImagevector(QStringList& inputfiles, std::vector<cv::Mat> &output)

@@ -23,8 +23,10 @@ void window_histmatching::setinput(cv::Mat &input)
     cv::Mat output;
     iaw::histDraw(input,output,message_signal.getMin(),message_signal.getMax());
 
+    qDebug() << ui->inputhistogram->width() << ui->inputhistogram->height();
+
     QImage dest(output.data,output.cols,output.rows,static_cast<int>(output.step),QImage::Format_Grayscale8);
-    QImage dest_scaled = dest.scaled(400,300, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+    QImage dest_scaled = dest.scaled(400,300, Qt::KeepAspectRatio, Qt::SmoothTransformation);
 
     input_scene.addPixmap(QPixmap::fromImage(dest_scaled));
 }

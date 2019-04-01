@@ -49,7 +49,7 @@ void contrastAdjustment(cv::Mat& input, cv::Mat& output, double alpha, double be
 
 void contrastAdjInterpolation(cv::Mat& input, cv::Mat& output, QVector<double>);
 
-void imageStitching(std::vector<cv::Mat>& input, cv::Mat& output);
+bool imageStitching(std::vector<cv::Mat>& input, cv::Mat& output);
 
 void loadImagevector(QStringList& inputfiles,std::vector<cv::Mat>& output);
 
