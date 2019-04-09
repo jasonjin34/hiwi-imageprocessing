@@ -8,7 +8,8 @@ message message_singal_curve;
 
 Curve::Curve(QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::Curve)
+    ui(new Ui::Curve),
+    tracking(false)
 {
     ui->setupUi(this);
     ui->curve_plot->setMouseTracking(true);
@@ -46,7 +47,8 @@ Curve::Curve(QWidget *parent) :
     connect(ui->button_clear,SIGNAL(clicked()),this,SLOT(on_button_clear_clicked()));
     connect(ui->curve_plot,SIGNAL(mousePress(QMouseEvent*)),this,SLOT(clickedGraph(QMouseEvent*)));
     connect(ui->Reset_button,SIGNAL(doubleclicked()),this,SLOT(on_Reset_button_clicked()));
-    connect(ui->curve_plot,SIGNAL(mouseMove(QMouseEvent*)),this, SLOT(mousePosition(QMouseEvent*)));
+    connect(ui->curve_plot,SIGNAL(mouseMove(QMouseEvent*)),this, SLOT(mouseMove(QMouseEvent*)));
+    connect(ui->curve_plot,SIGNAL(mouseRelease(QMouseEvent*)),this, SLOT(mouseRelease(QMouseEvent*)));
 }
 
 Curve::~Curve()
@@ -101,18 +103,18 @@ void Curve::updatePoint(double x, double y)
 
 }
 
-bool Curve::aroundPoint(double x, double y)
+int Curve::aroundPoint(double x, double y)
 {
-    QVector<double>::iterator it_x, it_y;
-    for(it_x = qv_x.begin(),it_y = qv_y.begin();it_x < qv_x.end();++it_x,++it_y)
+    int res = -1;
+    for(int i = 1; i < qv_x.size() -1; ++i)
     {
         //check if the cursor position with radius 8
-        if(sqrt((*it_x-x)*(*it_x-x)+(*it_y-y)*(*it_y-y)) < 8)
+        if(sqrt((qv_x[i]-x)*(qv_x[i]-x)+(qv_y[i]-y)*(qv_y[i]-y)) < 8)
         {
-            return true;
+            return i;
         }
     }
-    return false;
+    return res;
 }
 
 void Curve::deletePoint(double x, double y)
@@ -219,16 +221,22 @@ void Curve::clickedGraph(QMouseEvent *event)
     }
     if(event->buttons() & Qt::LeftButton)
     {
-        if(!aroundPoint(x_value,y_value))
+        int res = aroundPoint(x_value,y_value);
+        if(res == -1)
         {
             if(addPoint(x_value,y_value))
             {
+                trackPoint = qv_x.size()-2;
+                tracking = true;
                 updateGraph();
             }
             else
             {
                 QMessageBox::warning(this, "Interpolation Points Warning","reach to the max number of points");
             }
+        } else {
+            trackPoint = res;
+            tracking = true;
         }
     }
     else if(event->buttons() & Qt::RightButton)
@@ -238,39 +246,24 @@ void Curve::clickedGraph(QMouseEvent *event)
     }
 }
 
-void Curve::mousePosition(QMouseEvent *event)
+void Curve::mouseRelease(QMouseEvent* evt)
 {
-    QPoint point = event->pos();
-    //get the current cursor poistion
-    double x_value = ui->curve_plot->xAxis->pixelToCoord((point.x()));
-    double y_value = ui->curve_plot->yAxis->pixelToCoord((point.y()));
-    ui->CurrentPosition->setText(QString("%1,%2").arg(static_cast<int>(x_value)).arg(static_cast<int>(y_value)));
+    tracking = false;
+    evt->accept();
+}
 
-    if(event->buttons() & Qt::LeftButton)
-    {
-        if(qv_x.size() <= ui->numInterpolation->text().toInt() + 2)
-        {
-            if(qv_x[0] != 1.0){
-                qv_y.push_front(1.0);
-                qv_y.append(255.0);
-                qv_x.push_front(1.0);
-                qv_x.append(255.0);
-            }
-            if(qv_x.size() <= 2) addPoint(x_value,y_value);
-            else updatePoint(x_value,y_value);
-            updateGraph();
-        }
-        else
-        {
-            QMessageBox::warning(this, "Interpolation Points Warning","reach to the max number of points");
-        }
-
+void Curve::mouseMove(QMouseEvent *event)
+{
+    if(tracking) {
+        QPoint point = event->pos();
+        double x_value = ui->curve_plot->xAxis->pixelToCoord((point.x()));
+        double y_value = ui->curve_plot->yAxis->pixelToCoord((point.y()));
+        qv_x[trackPoint] = x_value;
+        qv_y[trackPoint] = y_value;
+        ui->CurrentPosition->setText(QString("%1,%2").arg(static_cast<int>(x_value)).arg(static_cast<int>(y_value)));
+        updateGraph();
     }
-    else if(event->button())
-    {
-        addPoint(x_value,y_value);
-        qDebug() << qv_x;
-    }
+    event->accept();
 }
 
 void Curve::on_x_point1_valueChanged(double arg1)

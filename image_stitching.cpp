@@ -166,6 +166,10 @@ void Image_stitching::on_searchImage_stitching_clicked()
     }
     else {
         QMessageBox::critical(this,"Image Loading error","need more images");
+        stitching_result.clear();
+        inputView1.clear();
+        inputView2.clear();
+        inputView3.clear();
     }
 }
 

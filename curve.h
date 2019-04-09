@@ -27,7 +27,7 @@ public:
      * @param x
      * @param y
      */
-    bool aroundPoint(double x, double y);
+    int aroundPoint(double x, double y);
     void deletePoint(double x, double y);
     void updateGraph();
     void clearData();
@@ -37,17 +37,20 @@ signals:
 
 private slots:
     void clickedGraph(QMouseEvent *event);
-    void mousePosition(QMouseEvent *event);
     void on_button_clear_clicked();
     double interpolation(double x);
     void on_x_point1_valueChanged(double arg1);
     void on_x_point2_valueChanged(double arg1);
     void on_Reset_button_clicked();
+    void mouseMove(QMouseEvent *event);
+    void mouseRelease(QMouseEvent* evt);
 
 private:
     Ui::Curve *ui;
 
     QVector<double> qv_x,qv_y;
+    bool tracking;
+    int trackPoint;
 };
 
 #endif // CURVE_H
