@@ -3,11 +3,6 @@
 #include <QLibrary>
 #include <Windows.h>
 
-#include <opencv2/opencv.hpp>
-#include <opencv2/imgcodecs.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc/types_c.h>
-#include <opencv2/stitching.hpp>
 #include <QDebug>
 
 extern "C"
@@ -26,6 +21,11 @@ Videostreaming::Videostreaming(QWidget *parent) :
 {
     ui->setupUi(this);
     //connect(ui->pushButton,SIGNAL(clicked()),this, SLOT(on_pushButton_clicked()));
+    ui->StreamView->setScene(new QGraphicsScene(this));
+    ui->StreamView->scene()->addItem(&pixmap);
+    videostop = false;
+    videopause = false;
+    this->fps = 1;
 }
 
 Videostreaming::~Videostreaming()
@@ -65,18 +65,7 @@ void Videostreaming::on_pushButton_clicked()
     //swscale function
     typedef struct SwsContext* (*sws_getContext)(int srcW, int srcH, enum AVPixelFormat srcFormat, int dstW, int dstH, enum AVPixelFormat dstFormat, int flags, SwsFilter *srcFilter, SwsFilter *dstFilter, const double *param);
     typedef int (*sws_scale)(struct SwsContext *c, const uint8_t *const srcSlice[], const int srcStride[], int srcSliceY, int srcSliceH, uint8_t *const dst[], const int dstStride[]);
-    typedef struct SwsContext* (*sws_getCachedContext)(	struct SwsContext * 	context,
-                                                        int 	srcW,
-                                                        int 	srcH,
-                                                        enum AVPixelFormat 	srcFormat,
-                                                        int 	dstW,
-                                                        int 	dstH,
-                                                        enum AVPixelFormat 	dstFormat,
-                                                        int 	flags,
-                                                        SwsFilter * 	srcFilter,
-                                                        SwsFilter * 	dstFilter,
-                                                        const double * 	param
-                                                        );
+    typedef struct SwsContext* (*sws_getCachedContext)(struct SwsContext* context,int srcW,int 	srcH, enum AVPixelFormat 	srcFormat,int 	dstW,int 	dstH,enum AVPixelFormat 	dstFormat,int 	flags,SwsFilter * 	srcFilter, SwsFilter * 	dstFilter,const double * 	param);
 
     //avutil function
     typedef AVFrame* (*av_frame_alloc)(void);
@@ -186,10 +175,16 @@ void Videostreaming::on_pushButton_clicked()
         int ret;
 
         //set the url link
-        int option = 2; // 1, local video, 2, rtsp protocal
+        /**
+        int option = 1; // 1, local video, 2, rtsp protocal
         const char* url;
         if(option == 1) url = "C:/HIWI/VideoStreaming/Videostreaming/testvideo.mp4";
         else url = "rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov";
+        */
+        QString qurl = ui->inputUrl->text();
+        std::string temp = qurl.toStdString();
+        const char* url = temp.c_str();
+
 
         // open input file context
         AVFormatContext* inctx = nullptr;
@@ -258,6 +253,7 @@ void Videostreaming::on_pushButton_clicked()
         int got_pic = 0;
         AVPacket pkt;
 
+        bool resize_status = false;
         do {
             if (!end_of_stream) {
                 // read packet from input file
@@ -265,6 +261,7 @@ void Videostreaming::on_pushButton_clicked()
                 if (ret < 0 && ret != AVERROR_EOF) {
                     std::cerr << "fail to av_read_frame: ret=" << ret;
                      qDebug() << "failed";
+                     break;
                 }
                 if (ret == 0 && pkt.stream_index != vstrm_idx)
                     goto next_packet;
@@ -282,19 +279,53 @@ void Videostreaming::on_pushButton_clicked()
             avcodecDecode_video2(vstrm->codec, decframe, &got_pic, &pkt);
             if (!got_pic)
                 goto next_packet;
-
             // convert frame to OpenCV matrix
             swsScale(swsctx, decframe->data, decframe->linesize, 0, decframe->height, frame->data, frame->linesize);
             {
-            cv::Mat image(dst_height, dst_width, CV_8UC3, framebuf.data(), frame->linesize[0]);
-            cv::imshow("press ESC to exit", image);
-            if (cv::waitKey(1) == 0x1b)
+                QImage dest1 = QImage(framebuf.data(), dst_width, dst_height,QImage::Format_RGB888);
+
+                if(resize_status == false)
+                {
+                   if(dst_width > 500 && dst_width < 1000 && dst_height > 400 && dst_height < 900)
+                   {
+                       ui->StreamView->resize(dst_width, dst_height);
+                       this->resize(dst_width + 20, dst_height +  80);
+                   }
+                   else if (dst_width > 1200 && dst_height > 900)
+                   {
+                       dest1 = dest1.scaled(1200,900, Qt::KeepAspectRatio);
+                       ui->StreamView->resize(1200, 900);
+                       this->resize(1200 + 20, 900 +  80);
+                   }
+                   else {
+                       ui->StreamView->resize(dst_width, dst_height);
+                       this->resize(dst_width + 20, dst_height +  80);
+                   }
+                }
+
+
+                pixmap.setPixmap(QPixmap::fromImage(dest1));
+            }
+            qDebug() << "current fps: " << this->fps;
+            cv::waitKey(this->fps);
+            //stop the stream
+            if(videostop)
+            {
+                this->close();
                 break;
             }
-            std::cout << nb_frames << '\r' << std::flush;  // dump progress
-            ++nb_frames;
 
-    next_packet:
+            if(this->videopause)
+            {
+                while(1)
+                {
+                    cv::waitKey(200);
+                    if(!this->videopause) break;
+                }
+            }
+            qDebug() << "frame number: " << nb_frames;
+            ++nb_frames;
+        next_packet:
             avFree_packet(&pkt);
 
         } while (!end_of_stream || got_pic);
@@ -313,4 +344,26 @@ void Videostreaming::on_pushButton_clicked()
     }
 }
 
+void Videostreaming::on_stopButton_clicked()
+{
+    this->videostop = true;
+}
 
+void Videostreaming::on_pauseButton_clicked()
+{
+    if(this->videopause == false)
+    {
+        this->videopause = true;
+    }
+    else this->videopause = false;
+}
+
+void Videostreaming::on_Speed_valueChanged(int value)
+{
+    this->fps = value;
+}
+
+void Videostreaming::closeEvent(QCloseEvent *bar)
+{
+    this->videostop = true;
+}
