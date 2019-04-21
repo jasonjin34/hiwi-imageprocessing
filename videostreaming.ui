@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>549</width>
-    <height>467</height>
+    <width>685</width>
+    <height>555</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -94,7 +94,7 @@
      <item>
       <widget class="QLineEdit" name="inputUrl">
        <property name="text">
-        <string>C:/HIWI/VideoStreaming/Videostreaming/testvideo.mp4</string>
+        <string>https://bitmovin-a.akamaihd.net/content/playhouse-vr/m3u8s/105560.m3u8</string>
        </property>
       </widget>
      </item>
@@ -115,7 +115,7 @@
      <item>
       <widget class="QPushButton" name="stopButton">
        <property name="text">
-        <string>Close</string>
+        <string>Stop</string>
        </property>
       </widget>
      </item>

@@ -182,16 +182,17 @@ void Videostreaming::on_pushButton_clicked()
         else url = "rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov";
         */
         QString qurl = ui->inputUrl->text();
+         qurl.replace("\\", "/");
         std::string temp = qurl.toStdString();
         const char* url = temp.c_str();
-
 
         // open input file context
         AVFormatContext* inctx = nullptr;
         ret = openInput(&inctx, url, nullptr, nullptr);
         if (ret < 0) {
             std::cerr << "fail to avforamt_open_input(\"" << url << "\"): ret=" << ret;
-            qDebug() << "failed";
+            QMessageBox::critical(this, "Error", "Invalid url, please try the valid one");
+            return;
         }
         // retrive input stream information
         ret = findStreamInfo(inctx, nullptr);
@@ -298,12 +299,9 @@ void Videostreaming::on_pushButton_clicked()
                        this->resize(1200 + 20, 900 +  80);
                    }
                    else {
-                       ui->StreamView->resize(dst_width, dst_height);
-                       this->resize(dst_width + 20, dst_height +  80);
+                       this->resize(1000, 840);
                    }
                 }
-
-
                 pixmap.setPixmap(QPixmap::fromImage(dest1));
             }
             qDebug() << "current fps: " << this->fps;
@@ -354,8 +352,13 @@ void Videostreaming::on_pauseButton_clicked()
     if(this->videopause == false)
     {
         this->videopause = true;
+        ui->pauseButton->setText("Continue");
     }
-    else this->videopause = false;
+    else
+    {
+        this->videopause = false;
+        ui->pauseButton->setText("Pause");
+    }
 }
 
 void Videostreaming::on_Speed_valueChanged(int value)
