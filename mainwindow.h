@@ -18,6 +18,7 @@
 #include "image_stitching.h"
 #include "curve.h"
 #include "message.h"
+#include "videostreaming.h"
 
 
 namespace Ui {
@@ -32,6 +33,7 @@ class MainWindow : public QMainWindow
     window_histmatching *hismatchinggui;
     Curve *curvegui;
     Image_stitching *stitchinggui;
+    Videostreaming *streaminggui;
     QGraphicsScene  m_scene_orig, m_scene_res;
     QGraphicsView   m_view;
     cv::Mat         m_image;
@@ -58,7 +60,7 @@ private slots:
 
     void on_actionLanuch_triggered();
 
-    void on_actionStitching_Contour_triggered();
+    void on_videoStreaming_triggered();
 
 private:
     void transform();

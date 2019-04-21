@@ -188,7 +188,9 @@ void MainWindow::on_actionLanuch_triggered()
 
 }
 
-void MainWindow::on_actionStitching_Contour_triggered()
-{
 
+void MainWindow::on_videoStreaming_triggered()
+{
+    streaminggui = new Videostreaming();
+    streaminggui->show();
 }

@@ -405,9 +405,16 @@
     <addaction name="actionLanuch"/>
     <addaction name="actionStitching_Contour"/>
    </widget>
+   <widget class="QMenu" name="menuVideo_Streaming">
+    <property name="title">
+     <string>Video Streaming</string>
+    </property>
+    <addaction name="videoStreaming"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuCurve"/>
    <addaction name="menuImage_Stitching"/>
+   <addaction name="menuVideo_Streaming"/>
   </widget>
   <action name="actionSearch">
    <property name="text">
@@ -427,6 +434,11 @@
   <action name="actionStitching_Contour">
    <property name="text">
     <string>Stitching Contour </string>
+   </property>
+  </action>
+  <action name="videoStreaming">
+   <property name="text">
+    <string>Lanuch</string>
    </property>
   </action>
  </widget>
