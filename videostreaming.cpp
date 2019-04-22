@@ -35,6 +35,10 @@ Videostreaming::~Videostreaming()
 
 void Videostreaming::on_pushButton_clicked()
 {
+    this->videostop = false;
+    this->videopause = false;
+    ui->pauseButton->setText("Pause");
+    ui->pushButton->setText("Restart");
     //avformat functions
     typedef void (*av_register_all) (void);
     typedef int (*av_read_frame) (AVFormatContext *s, AVPacket* pkt);
@@ -283,7 +287,7 @@ void Videostreaming::on_pushButton_clicked()
             // convert frame to OpenCV matrix
             swsScale(swsctx, decframe->data, decframe->linesize, 0, decframe->height, frame->data, frame->linesize);
             {
-                QImage dest1 = QImage(framebuf.data(), dst_width, dst_height,QImage::Format_RGB888);
+                QImage dest = QImage(framebuf.data(), dst_width, dst_height,QImage::Format_RGB888);
 
                 if(resize_status == false)
                 {
@@ -294,22 +298,23 @@ void Videostreaming::on_pushButton_clicked()
                    }
                    else if (dst_width > 1200 && dst_height > 900)
                    {
-                       dest1 = dest1.scaled(1200,900, Qt::KeepAspectRatio);
+                       dest = dest.scaled(1200,900, Qt::KeepAspectRatio);
                        ui->StreamView->resize(1200, 900);
                        this->resize(1200 + 20, 900 +  80);
                    }
                    else {
-                       this->resize(1000, 840);
+                       this->resize(1000 + 20, 560 + 80);
+                       ui->StreamView->resize(1000, 563);
+                       dest = dest.scaled(1000, 563, Qt::KeepAspectRatio);
                    }
                 }
-                pixmap.setPixmap(QPixmap::fromImage(dest1));
+                pixmap.setPixmap(QPixmap::fromImage(dest));
             }
             qDebug() << "current fps: " << this->fps;
             cv::waitKey(this->fps);
             //stop the stream
             if(videostop)
             {
-                this->close();
                 break;
             }
 
