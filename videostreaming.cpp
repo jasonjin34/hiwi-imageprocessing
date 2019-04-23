@@ -23,8 +23,11 @@ Videostreaming::Videostreaming(QWidget *parent) :
     //connect(ui->pushButton,SIGNAL(clicked()),this, SLOT(on_pushButton_clicked()));
     ui->StreamView->setScene(new QGraphicsScene(this));
     ui->StreamView->scene()->addItem(&pixmap);
+    ui->StreamView->setMinimumWidth(600);
+    ui->StreamView->setMinimumHeight(450);
     videostop = false;
     videopause = false;
+    this->createVideo = false;
     this->fps = 1;
 }
 
@@ -250,7 +253,6 @@ void Videostreaming::on_pushButton_clicked()
         std::vector<uint8_t> framebuf(avpictureGetSize(dst_pix_fmt, dst_width, dst_height));
         avpictureFill(reinterpret_cast<AVPicture*>(frame), framebuf.data(), dst_pix_fmt, dst_width, dst_height);
 
-
         // decoding loop
         AVFrame* decframe = avFrameAlloc();
         unsigned nb_frames = 0;
@@ -288,27 +290,36 @@ void Videostreaming::on_pushButton_clicked()
             swsScale(swsctx, decframe->data, decframe->linesize, 0, decframe->height, frame->data, frame->linesize);
             {
                 QImage dest = QImage(framebuf.data(), dst_width, dst_height,QImage::Format_RGB888);
+                screenshotimage = cv::Mat(dst_height, dst_width, CV_8UC3, framebuf.data(), frame->linesize[0]);
 
+                //using opencv to record the video
+                if(videoname.toStdString().length() > 2)
+                {
+                    if(!this->createVideo)
+                    {
+                      video = cv::VideoWriter(videoname.toStdString(),cv::VideoWriter::fourcc('M','J','P','G'), 10, cv::Size(dst_width, dst_height));
+                      this->createVideo = true;
+                    }
+                }
+
+                if(videoname.toStdString().length() > 2)
+                {
+                     video.write(screenshotimage);
+                     qDebug() << "Recording .....";
+                }
+
+                ui->StreamView->setAlignment(Qt::AlignCenter);
                 if(resize_status == false)
                 {
-                   if(dst_width > 500 && dst_width < 1000 && dst_height > 400 && dst_height < 900)
+                   if(dst_width > 800 || dst_height > 600)
                    {
-                       ui->StreamView->resize(dst_width, dst_height);
-                       this->resize(dst_width + 20, dst_height +  80);
-                   }
-                   else if (dst_width > 1200 && dst_height > 900)
-                   {
-                       dest = dest.scaled(1200,900, Qt::KeepAspectRatio);
-                       ui->StreamView->resize(1200, 900);
-                       this->resize(1200 + 20, 900 +  80);
-                   }
-                   else {
-                       this->resize(1000 + 20, 560 + 80);
-                       ui->StreamView->resize(1000, 563);
-                       dest = dest.scaled(1000, 563, Qt::KeepAspectRatio);
+                       int width = ui->StreamView->geometry().width();
+                       int height = ui->StreamView->geometry().height();
+                       dest = dest.scaled(width, height, Qt::KeepAspectRatio);
                    }
                 }
                 pixmap.setPixmap(QPixmap::fromImage(dest));
+                ui->StreamView->setAlignment(Qt::AlignCenter);
             }
             qDebug() << "current fps: " << this->fps;
             cv::waitKey(this->fps);
@@ -350,6 +361,9 @@ void Videostreaming::on_pushButton_clicked()
 void Videostreaming::on_stopButton_clicked()
 {
     this->videostop = true;
+    ui->pushButton->setText("Start");
+    ui->RecordingButton->setText("Record");
+    video.release();
 }
 
 void Videostreaming::on_pauseButton_clicked()
@@ -374,4 +388,27 @@ void Videostreaming::on_Speed_valueChanged(int value)
 void Videostreaming::closeEvent(QCloseEvent *bar)
 {
     this->videostop = true;
+    video.release();
+}
+
+void Videostreaming::on_screenshotButton_clicked()
+{
+    ui->pauseButton->setText("Continue");
+    this->videopause = true;
+    QString filename = QFileDialog::getSaveFileName(this, tr("Save Screenshot Image"), "C:/", tr("Image (*.png *.xmp *jpg)"));
+    cv::imwrite(filename.toStdString(), this->screenshotimage);
+    ui->pauseButton->setText("Pause");
+    this->videopause = false;
+}
+
+void Videostreaming::on_RecordingButton_clicked()
+{
+    ui->pauseButton->setText("Continue");
+    this->videopause = true;
+
+    this->videoname = QFileDialog::getSaveFileName(this, tr("Recording Image"), "C:/", tr("Video (*.avi)"));
+    ui->RecordingButton->setText("Recording .... ");
+
+    ui->pauseButton->setText("Pause");
+    this->videopause = false;
 }

@@ -8,6 +8,7 @@
 #include <QPixmap>
 #include <QCloseEvent>
 #include <QMessageBox>
+#include <QFileDialog>
 
 #include <opencv2/opencv.hpp>
 #include <opencv2/imgcodecs.hpp>
@@ -39,13 +40,21 @@ private slots:
 
     void on_Speed_valueChanged(int value);
 
+    void on_screenshotButton_clicked();
+
+    void on_RecordingButton_clicked();
+
 private:
     void closeEvent(QCloseEvent *bar);
 
     Ui::Videostreaming *ui;
     bool videopause;
     bool videostop;
+    bool createVideo;
     int fps;
+    cv::VideoWriter video;
+    cv::Mat screenshotimage;
+    QString videoname;
 };
 
 #endif // VIDEOSTREAMING_H
