@@ -177,8 +177,8 @@ void Videostreaming::on_pushButton_clicked()
         qDebug() << formatS;
 
         /*********************************get frame image code**********************************/
-        registerAll();
-        initStreamNetwork();
+        av_register_all();
+        avformat_network_init();
         int ret;
 
         //set the url link

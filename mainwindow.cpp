@@ -191,6 +191,6 @@ void MainWindow::on_actionLanuch_triggered()
 
 void MainWindow::on_videoStreaming_triggered()
 {
-    streaminggui = new Videostreaming();
+    streaminggui = new videoStream();
     streaminggui->show();
 }

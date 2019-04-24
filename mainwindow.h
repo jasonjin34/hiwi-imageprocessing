@@ -18,7 +18,7 @@
 #include "image_stitching.h"
 #include "curve.h"
 #include "message.h"
-#include "videostreaming.h"
+#include "videostream.h"
 
 
 namespace Ui {
@@ -33,7 +33,7 @@ class MainWindow : public QMainWindow
     window_histmatching *hismatchinggui;
     Curve *curvegui;
     Image_stitching *stitchinggui;
-    Videostreaming *streaminggui;
+    videoStream *streaminggui;
     QGraphicsScene  m_scene_orig, m_scene_res;
     QGraphicsView   m_view;
     cv::Mat         m_image;
