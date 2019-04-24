@@ -54,6 +54,16 @@ private slots:
 
     void on_actionStop_Video_triggered();
 
+    void on_actionFaster_triggered();
+
+    void on_actionFaster_2_triggered();
+
+    void on_actionNormal_Speed_triggered();
+
+    void on_actionSlower_fine_triggered();
+
+    void on_actionSlower_triggered();
+
 private:
     void closeEvent(QCloseEvent *bar);
 

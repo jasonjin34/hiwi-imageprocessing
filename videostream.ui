@@ -19,7 +19,7 @@
      <widget class="QGraphicsView" name="StreamView"/>
     </item>
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,10,1,4,1">
+     <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,10,1,0,1">
       <item>
        <widget class="QLabel" name="label">
         <property name="text">
@@ -91,9 +91,21 @@
     <property name="title">
      <string>Playback</string>
     </property>
+    <widget class="QMenu" name="menuSpeed">
+     <property name="title">
+      <string>Speed</string>
+     </property>
+     <addaction name="actionFaster"/>
+     <addaction name="actionFaster_2"/>
+     <addaction name="actionNormal_Speed"/>
+     <addaction name="actionSlower_fine"/>
+     <addaction name="actionSlower"/>
+    </widget>
     <addaction name="actionPlay"/>
     <addaction name="actionPause"/>
     <addaction name="actionStop_Video"/>
+    <addaction name="separator"/>
+    <addaction name="menuSpeed"/>
    </widget>
    <addaction name="menuPlayback"/>
    <addaction name="menuSave"/>
@@ -122,6 +134,31 @@
   <action name="actionStop_Video">
    <property name="text">
     <string>Stop Video</string>
+   </property>
+  </action>
+  <action name="actionFaster">
+   <property name="text">
+    <string>Faster</string>
+   </property>
+  </action>
+  <action name="actionFaster_2">
+   <property name="text">
+    <string>Faster ( fine )</string>
+   </property>
+  </action>
+  <action name="actionNormal_Speed">
+   <property name="text">
+    <string>Normal Speed</string>
+   </property>
+  </action>
+  <action name="actionSlower_fine">
+   <property name="text">
+    <string>Slower( fine )</string>
+   </property>
+  </action>
+  <action name="actionSlower">
+   <property name="text">
+    <string>Slower</string>
    </property>
   </action>
  </widget>

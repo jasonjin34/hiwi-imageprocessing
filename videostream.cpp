@@ -15,7 +15,7 @@ videoStream::videoStream(QWidget *parent) :
     videostop = false;
     videopause = false;
     this->createVideo = false;
-    this->fps = 1;
+    this->fps = 10;
 }
 
 videoStream::~videoStream()
@@ -250,4 +250,29 @@ void videoStream::on_actionStop_Video_triggered()
 {
     this->videostop = true;
     video.release();
+}
+
+void videoStream::on_actionFaster_triggered()
+{
+    this->fps = 0;
+}
+
+void videoStream::on_actionFaster_2_triggered()
+{
+    this->fps = 5;
+}
+
+void videoStream::on_actionNormal_Speed_triggered()
+{
+    this->fps = 10;
+}
+
+void videoStream::on_actionSlower_fine_triggered()
+{
+    this->fps = 25;
+}
+
+void videoStream::on_actionSlower_triggered()
+{
+    this->fps = 50;
 }
