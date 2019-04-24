@@ -42,8 +42,6 @@ public:
     ~videoStream();
 
 private slots:   
-    void on_Speed_valueChanged(int value);
-
     void on_actionScreenshot_triggered();
 
     void on_actionRecord_triggered();
@@ -63,6 +61,10 @@ private slots:
     void on_actionSlower_fine_triggered();
 
     void on_actionSlower_triggered();
+
+    void on_actionLoad_Local_File_triggered();
+
+    void on_actionClose_triggered();
 
 private:
     void closeEvent(QCloseEvent *bar);

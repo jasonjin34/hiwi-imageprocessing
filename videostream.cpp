@@ -23,12 +23,6 @@ videoStream::~videoStream()
     delete ui;
 }
 
-
-void videoStream::on_Speed_valueChanged(int value)
-{
-    this->fps = value;
-}
-
 void videoStream::closeEvent(QCloseEvent *bar)
 {
     this->videostop = true;
@@ -275,4 +269,16 @@ void videoStream::on_actionSlower_fine_triggered()
 void videoStream::on_actionSlower_triggered()
 {
     this->fps = 50;
+}
+
+void videoStream::on_actionLoad_Local_File_triggered()
+{
+    QString filename = QFileDialog::getOpenFileName(this, "Open Video File", "C:/HIWI", "Images (*.mp4 *.avi)");
+    ui->inputUrl->setText(filename);
+}
+
+void videoStream::on_actionClose_triggered()
+{
+    on_actionStop_Video_triggered();
+    this->close();
 }

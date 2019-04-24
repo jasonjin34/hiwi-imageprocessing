@@ -19,11 +19,14 @@
      <widget class="QGraphicsView" name="StreamView"/>
     </item>
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,10,1,0,1">
+     <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,10">
       <item>
        <widget class="QLabel" name="label">
         <property name="text">
-         <string>RTSP URL</string>
+         <string> URL</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
         </property>
        </widget>
       </item>
@@ -31,39 +34,6 @@
        <widget class="QLineEdit" name="inputUrl">
         <property name="text">
          <string>https://bitmovin-a.akamaihd.net/content/playhouse-vr/m3u8s/105560.m3u8</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="label_3">
-        <property name="layoutDirection">
-         <enum>Qt::RightToLeft</enum>
-        </property>
-        <property name="text">
-         <string>fast</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QSlider" name="Speed">
-        <property name="minimum">
-         <number>1</number>
-        </property>
-        <property name="maximum">
-         <number>50</number>
-        </property>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="label_2">
-        <property name="text">
-         <string>slow</string>
         </property>
        </widget>
       </item>
@@ -107,6 +77,14 @@
     <addaction name="separator"/>
     <addaction name="menuSpeed"/>
    </widget>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionLoad_Local_File"/>
+    <addaction name="actionClose"/>
+   </widget>
+   <addaction name="menuFile"/>
    <addaction name="menuPlayback"/>
    <addaction name="menuSave"/>
   </widget>
@@ -159,6 +137,16 @@
   <action name="actionSlower">
    <property name="text">
     <string>Slower</string>
+   </property>
+  </action>
+  <action name="actionLoad_Local_File">
+   <property name="text">
+    <string>Load File</string>
+   </property>
+  </action>
+  <action name="actionClose">
+   <property name="text">
+    <string>Close</string>
    </property>
   </action>
  </widget>
