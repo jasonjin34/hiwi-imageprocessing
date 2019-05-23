@@ -12,6 +12,7 @@
 #include <QGraphicsProxyWidget>
 #include <QMessageBox>
 #include <QThread>
+
 #include <QFuture>
 #include <QTime>
 #include <QtConcurrent>

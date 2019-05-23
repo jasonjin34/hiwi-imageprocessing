@@ -1,3 +1,9 @@
+/*
+ * QImageUpdate, create new image only if the framesize change
+ * runing time
+ * scanLine function ..
+**/
+
 #include "videostreaming.h"
 #include "ui_videostreaming.h"
 #include <QLibrary>

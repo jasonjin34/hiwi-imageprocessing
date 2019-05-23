@@ -194,3 +194,9 @@ void MainWindow::on_videoStreaming_triggered()
     streaminggui = new videoStream();
     streaminggui->show();
 }
+
+void MainWindow::on_actionLaunch_triggered()
+{
+    compositiongui = new Composition();
+    compositiongui->show();
+}

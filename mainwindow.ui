@@ -411,10 +411,17 @@
     </property>
     <addaction name="videoStreaming"/>
    </widget>
+   <widget class="QMenu" name="menuImage_Composition">
+    <property name="title">
+     <string>Image Composition</string>
+    </property>
+    <addaction name="actionLaunch"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuCurve"/>
    <addaction name="menuImage_Stitching"/>
    <addaction name="menuVideo_Streaming"/>
+   <addaction name="menuImage_Composition"/>
   </widget>
   <action name="actionSearch">
    <property name="text">
@@ -439,6 +446,11 @@
   <action name="videoStreaming">
    <property name="text">
     <string>Lanuch</string>
+   </property>
+  </action>
+  <action name="actionLaunch">
+   <property name="text">
+    <string>Launch</string>
    </property>
   </action>
  </widget>

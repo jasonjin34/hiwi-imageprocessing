@@ -168,7 +168,7 @@ void videoStream::on_actionPlay_triggered()
             {
                 if(!this->createVideo)
                 {
-                  video = cv::VideoWriter(videoname.toStdString(),cv::VideoWriter::fourcc('M','J','P','G'), 10, cv::Size(dst_width, dst_height));
+                  video = cv::VideoWriter(videoname.toStdString(),cv::VideoWriter::fourcc('M','J','P','G'), this->fps , cv::Size(dst_width, dst_height));
                   this->createVideo = true;
                 }
             }

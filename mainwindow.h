@@ -19,6 +19,7 @@
 #include "curve.h"
 #include "message.h"
 #include "videostream.h"
+#include "composition.h"
 
 
 namespace Ui {
@@ -31,6 +32,7 @@ class MainWindow : public QMainWindow
 
     Ui::MainWindow  *ui;
     window_histmatching *hismatchinggui;
+    Composition *compositiongui;
     Curve *curvegui;
     Image_stitching *stitchinggui;
     videoStream *streaminggui;
@@ -61,6 +63,8 @@ private slots:
     void on_actionLanuch_triggered();
 
     void on_videoStreaming_triggered();
+
+    void on_actionLaunch_triggered();
 
 private:
     void transform();
