@@ -24,6 +24,7 @@ public:
 private slots:
     void on_loadImageButton_clicked();
     void mouseMove(QMouseEvent*);
+    void mousePress(QMouseEvent*);
     void composeImage();
 
     void on_TestButton_clicked();
@@ -33,6 +34,7 @@ private:
     QVector<QImage> sourceImageVector;
     QCPItemRect* rect;
     QImage source_image, destination_image, temp_image;
+    int destination_image_index;
     QPoint mousePosition;
 };
 

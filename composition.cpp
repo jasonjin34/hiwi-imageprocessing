@@ -14,10 +14,7 @@ Composition::Composition(QWidget *parent) :
     ui->resultImage->yAxis->setVisible(false);
     ui->resultImage->setBackgroundScaled(true);
     ui->resultImage->setBackgroundScaledMode(Qt::KeepAspectRatio);
-
-    // set the mouse tracting rectangle
-    // this->rect = new QCPItemRect(ui->resultImage);
-    // rect->setPen(QPen(Qt::blue));
+    this->destination_image_index = 0;
 
     // add combobox items
     ui->composition_type->addItem("Layer1");
@@ -27,6 +24,7 @@ Composition::Composition(QWidget *parent) :
     // slot signal
     connect(ui->loadImageButton, SIGNAL(click()),this, SLOT(on_loadImageButton_clicked()));
     connect(ui->resultImage,SIGNAL(mouseMove(QMouseEvent*)),this, SLOT(mouseMove(QMouseEvent*)));
+    connect(ui->resultImage,SIGNAL(mousePress(QMouseEvent*)), this, SLOT(mousePress(QMouseEvent*)));
     connect(ui->composition_type,SIGNAL(activated(int)), this, SLOT(composeImage()));
 }
 
@@ -67,6 +65,7 @@ void Composition::on_loadImageButton_clicked()
         ui->resultImage->setBackground(start_image);
         ui->resultImage->resize(width, height);
         this->resize(static_cast<int>(width*6.0/5.0),height - 40);
+        this->destination_image = sourceImageVector[destination_image_index].copy();
     }
     else {
         this->sourceImageVector.clear();
@@ -81,14 +80,22 @@ void Composition::mouseMove(QMouseEvent* event)
     // origin point x = 0, y = 0 is ont the top left corner
     QPoint point = event->pos();
     this->mousePosition = point;
-    /*
-    double x_pos = ui->resultImage->xAxis->pixelToCoord(point.x());
-    double y_pos = ui->resultImage->yAxis->pixelToCoord(point.y());
-    rect->topLeft->setCoords(x_pos - 0.5, y_pos + 0.5);
-    rect->bottomRight->setCoords(x_pos + 0.5, y_pos - 0.5);
-    */
+
     this->ui->resultImage->replot();
     on_TestButton_clicked();
+}
+
+void Composition::mousePress(QMouseEvent * event)
+{
+    if (!this->sourceImageVector.isEmpty())
+    {
+        if(event->buttons() & Qt::LeftButton) this->destination_image_index =  ( this->destination_image_index  + 1 ) % 3;
+        else if (event->buttons() & Qt::RightButton) this->destination_image_index =  ( this->destination_image_index - 1 < 0 ? destination_image_index + 2 : destination_image_index - 1) % 3;
+        qDebug() << "test" << destination_image_index;
+        this->destination_image = sourceImageVector[destination_image_index];
+        on_TestButton_clicked();
+        this->ui->resultImage->replot();
+    }
 }
 
 void Composition::composeImage()
@@ -121,19 +128,18 @@ void Composition::on_TestButton_clicked()
         int image_width = sourceImageVector[0].width();
         int image_height = sourceImageVector[0].height();
         static const QSize imagesize(image_width, image_height);
-        //this->temp_image = QImage(imagesize, QImage::Format_ARGB32_Premultiplied);
-        this->temp_image = source_image.copy();
+
+        this->temp_image = destination_image.copy();
         QPainter painter(&temp_image);
         int delta_width, delta_height;
         delta_width = static_cast<int>(image_width * 0.5 / 5.0);
         delta_height = static_cast<int>(image_height * 0.5 / 5.0);
-        //qDebug() << delta_width << delta_height << mouseX << mouseY;
 
         QRect target(QPoint(mouseX - delta_width, mouseY - delta_height), QPoint(mouseX + delta_width, mouseY + delta_height));
         QRect source(QPoint(mouseX - delta_width, mouseY - delta_height), QPoint(mouseX + delta_width, mouseY + delta_height));
         qDebug() << target << source;
 
-        painter.drawImage(target, sourceImageVector[0], source);
+        painter.drawImage(target, source_image, source);
         painter.end();
         temp_image.scaled(ui->resultImage->width(), ui->resultImage->height(),Qt::KeepAspectRatio);
         QPixmap result = QPixmap::fromImage(temp_image);
