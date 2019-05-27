@@ -82,7 +82,7 @@ void Composition::mouseMove(QMouseEvent* event)
     this->mousePosition = point;
 
     this->ui->resultImage->replot();
-    on_TestButton_clicked();
+    alterImage();
 }
 
 void Composition::mousePress(QMouseEvent * event)
@@ -93,8 +93,9 @@ void Composition::mousePress(QMouseEvent * event)
         else if (event->buttons() & Qt::RightButton) this->destination_image_index =  ( this->destination_image_index - 1 < 0 ? destination_image_index + 2 : destination_image_index - 1) % 3;
         qDebug() << "test" << destination_image_index;
         this->destination_image = sourceImageVector[destination_image_index];
-        on_TestButton_clicked();
+        alterImage();
         this->ui->resultImage->replot();
+        ui->background_image->setText(QString("Layer%1").arg(destination_image_index));
     }
 }
 
@@ -119,7 +120,7 @@ void Composition::composeImage()
 }
 
 
-void Composition::on_TestButton_clicked()
+void Composition::alterImage()
 {
     if(!this->sourceImageVector.isEmpty())
     {

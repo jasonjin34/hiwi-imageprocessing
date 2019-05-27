@@ -26,8 +26,7 @@ private slots:
     void mouseMove(QMouseEvent*);
     void mousePress(QMouseEvent*);
     void composeImage();
-
-    void on_TestButton_clicked();
+    void alterImage();
 
 private:
     Ui::Composition *ui;
