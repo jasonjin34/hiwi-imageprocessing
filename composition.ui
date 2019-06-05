@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1029</width>
-    <height>735</height>
+    <width>1283</width>
+    <height>805</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -51,7 +51,7 @@
        <item>
         <widget class="QLabel" name="label_2">
          <property name="text">
-          <string>Surface</string>
+          <string>Composition Mode</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
@@ -61,7 +61,10 @@
        <item>
         <widget class="QComboBox" name="composition_type">
          <property name="layoutDirection">
-          <enum>Qt::RightToLeft</enum>
+          <enum>Qt::LeftToRight</enum>
+         </property>
+         <property name="sizeAdjustPolicy">
+          <enum>QComboBox::AdjustToContents</enum>
          </property>
         </widget>
        </item>
@@ -127,9 +130,12 @@
          <item>
           <widget class="QScrollBar" name="scaleValue">
            <property name="minimum">
-            <number>2</number>
+            <number>1</number>
            </property>
            <property name="maximum">
+            <number>100</number>
+           </property>
+           <property name="value">
             <number>10</number>
            </property>
            <property name="orientation">

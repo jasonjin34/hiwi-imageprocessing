@@ -23,6 +23,14 @@ Composition::Composition(QWidget *parent) :
     // add combobox items
     ui->composition_type->addItem("SourceOver");
     ui->composition_type->addItem("DestinationOver");
+    ui->composition_type->addItem("Xor");
+    ui->composition_type->addItem("Darken");
+    ui->composition_type->addItem("Lighten");
+    ui->composition_type->addItem("ColorDodge");
+    ui->composition_type->addItem("ColorBurn");
+    ui->composition_type->addItem("HardLight");
+    ui->composition_type->addItem("SoftLight");
+    ui->composition_type->addItem("Difference");
 
     // slot signal
     connect(ui->loadImageButton, SIGNAL(click()),this, SLOT(on_loadImageButton_clicked()));
@@ -84,31 +92,31 @@ void Composition::on_loadImageButton_clicked()
             QImage destscaled = temp_image.scaled(width,height,Qt::KeepAspectRatio,Qt::SmoothTransformation);
             sourceImageVector.append(destscaled);
         }
-        QPixmap start_image = QPixmap::fromImage(sourceImageVector[0]);
-        QPixmap reference_image = QPixmap::fromImage(sourceImageVector[1]);
+        start_image = QPixmap::fromImage(sourceImageVector[0]);
+        reference_image = QPixmap::fromImage(sourceImageVector[1]);
+        image_pixmap_origin->setPixmap(reference_image);
+        image_pixmap_reference->setPixmap(start_image);
 
-        ui->resultImage->resize(width, height);
-        this->resize(static_cast<int>(width*6.0/5.0),height - 40);
-        this->destination_image = sourceImageVector[destination_image_index].copy();
-        //image width and height
+        ratio = static_cast<double>(start_image.size().width()) / static_cast<double>(start_image.size().height());
         double image_width, image_height;
         double scale = 4;
         image_width = 5.0 / scale;
-        image_height = 5.0 / scale;
+        image_height = ratio * 5.0 / scale;
 
 
         image_pixmap_origin->topLeft->setCoords(2.0 - image_width, 3.0 + image_height);
         image_pixmap_origin->bottomRight->setCoords(2.0 + image_width, 3.0 - image_height);
-        image_pixmap_origin->setPixmap(reference_image);
         QPointF center = QPointF(2, 3);
         this->centerList.append(center);
 
         image_pixmap_reference->topLeft->setCoords(3.0 - image_width, 2.0 + image_height);
         image_pixmap_reference->bottomRight->setCoords(3.0 + image_width, 2.0 - image_height);
-        qDebug() << 3.0 + image_width << 2.0 - image_height;
-        image_pixmap_reference->setPixmap(start_image);
         center= QPoint(3, 2);
         this->centerList.append(center);
+
+        //load source image for comparision
+        this->source_image = this->sourceImageVector[0];
+        this->destination_image = this->sourceImageVector[1];
 
         ui->resultImage->replot();
     }
@@ -117,6 +125,9 @@ void Composition::on_loadImageButton_clicked()
     }
     //set the origin source
     composeImage();
+
+    scale_origin = 4.0;
+    scale_reference = 4.0;
 }
 
 void Composition::mouseMove(QMouseEvent* event)
@@ -134,12 +145,12 @@ void Composition::mouseMove(QMouseEvent* event)
        bool pointInReference = false;
        bool intersection = false;
        if( x_temp > centerList[0].x() - 5.0 / scale_origin && x_temp < centerList[0].x() + 5.0 / scale_origin
-               && y_temp > centerList[0].y() - 5.0 / scale_origin && y_temp < centerList[0].y() + 5.0 / scale_origin)
+               && y_temp > centerList[0].y() - ratio * 5.0 / scale_origin && y_temp < centerList[0].y() + ratio * 5.0 / scale_origin)
        {
            pointInOrigin = true;
        }
        if( x_temp > centerList[1].x() - 5.0 / scale_origin && x_temp < centerList[1].x() + 5.0 / scale_origin
-               && y_temp > centerList[1].y() - 5.0 / scale_origin && y_temp < centerList[1].y() + 5.0 / scale_origin)
+               && y_temp > centerList[1].y() - ratio * 5.0 / scale_origin && y_temp < centerList[1].y() + ratio * 5.0 / scale_origin)
        {
            pointInReference = true;
        }
@@ -148,14 +159,15 @@ void Composition::mouseMove(QMouseEvent* event)
 
        if(pointInOrigin && !intersection)
        {
-           ui->ShowLayer->setText("Destination");
+           showlayerString = "Destination";
            x_temp = centerList[0].x() + mousePosition_x_diff;
            y_temp = centerList[0].y() + mousePosition_y_diff;
            centerList[0] = QPointF(x_temp, y_temp);
+
            imagerender();
        }
        else if(pointInReference && !intersection){
-           ui->ShowLayer->setText("Source");
+           showlayerString = "Source";
            x_temp = centerList[1].x() + mousePosition_x_diff;
            y_temp = centerList[1].y() + mousePosition_y_diff;
            centerList[1] = QPointF(x_temp, y_temp);
@@ -165,20 +177,21 @@ void Composition::mouseMove(QMouseEvent* event)
        {
            if(this->source_layer == "SourceOver")
            {
-               ui->ShowLayer->setText("Source");
+               showlayerString = "Source";
                x_temp = centerList[1].x() + mousePosition_x_diff;
                y_temp = centerList[1].y() + mousePosition_y_diff;
                centerList[1] = QPointF(x_temp, y_temp);
                imagerender();
            }
            else {
-               ui->ShowLayer->setText("Destination");
+               showlayerString = "Destination";
                x_temp = centerList[0].x() + mousePosition_x_diff;
                y_temp = centerList[0].y() + mousePosition_y_diff;
                centerList[0] = QPointF(x_temp, y_temp);
-                imagerender();
+               imagerender();
            }
        }
+       composeImage();
    }
    this->mousePosition_old = this->mousePosition_new;
 }
@@ -188,7 +201,6 @@ void Composition::mousePress(QMouseEvent * event)
     if(event->buttons() & Qt::LeftButton)
     {
         this->tracking = true;
-
         // init mouse Position
         double x_temp = ui->resultImage->xAxis->pixelToCoord(event->pos().x());
         double y_temp = ui->resultImage->yAxis->pixelToCoord(event->pos().y());
@@ -202,16 +214,80 @@ void Composition::mousePress(QMouseEvent * event)
 void Composition::mouseRelease(QMouseEvent* event)
 {
     tracking = false;
+    ui->ShowLayer->setText(showlayerString);
     event->accept();
 }
 
 void Composition::imagerender()
 {
-    image_pixmap_origin->topLeft->setCoords(centerList[0].x() - 5 / scale_origin, centerList[0].y() + 5 / scale_origin);
-    image_pixmap_origin->bottomRight->setCoords(centerList[0].x() + 5 / scale_origin, centerList[0].y() - 5 / scale_origin);
-    image_pixmap_reference->topLeft->setCoords(centerList[1].x() - 5 / scale_reference, centerList[1].y() + 5 / scale_reference);
-    image_pixmap_reference->bottomRight->setCoords(centerList[1].x() + 5 / scale_reference, centerList[1].y() - 5 / scale_reference);
+    image_pixmap_origin->topLeft->setCoords(centerList[0].x() - 5.0 / scale_origin, centerList[0].y() + ratio * 5.0 / scale_origin);
+    image_pixmap_origin->bottomRight->setCoords(centerList[0].x() + 5.0 / scale_origin, centerList[0].y() - ratio * 5.0 / scale_origin);
+    image_pixmap_reference->topLeft->setCoords(centerList[1].x() - 5.0 / scale_reference, centerList[1].y() + ratio * 5.0 / scale_reference);
+    image_pixmap_reference->bottomRight->setCoords(centerList[1].x() + 5.0 / scale_reference, centerList[1].y() - ratio * 5.0 / scale_reference);
     ui->resultImage->replot();
+}
+
+bool Composition::checkPoint(QPointF point)
+{
+   bool temp = false;
+   double x_diff_left = point.x() - centerList[1].x() + 5.0 / scale_reference;
+   double x_diff_right = point.x() - centerList[1].x() - 5.0 / scale_reference;
+   double y_diff_left = point.y() - centerList[1].y() + ratio * 5.0 / scale_reference;
+   double y_diff_right = point.y() - centerList[1].y() - ratio * 5.0 / scale_reference;
+
+   if(x_diff_left > 0 && x_diff_right < 0)
+   {
+       if(y_diff_left > 0 && y_diff_right < 0)
+       {
+           temp = true;
+       }
+   }
+   return temp;
+}
+
+bool Composition::overlapfunction()
+{
+    bool output = false;
+    if(!centerList.isEmpty())
+    {
+        QPointF temp_topright = QPointF(centerList[0].x() + 5.0 / scale_origin, centerList[0].y() + ratio * 5.0 / scale_origin);
+        QPointF temp_topleft = QPointF(centerList[0].x() - 5.0 / scale_origin, centerList[0].y() + ratio * 5.0 / scale_origin);
+        QPointF temp_bottomright = QPointF(centerList[0].x() + 5.0 / scale_origin, centerList[0].y() - ratio * 5.0 / scale_origin);
+        QPointF temp_bottomleft = QPointF(centerList[0].x() - 5.0 / scale_origin, centerList[0].y() - ratio * 5.0 / scale_origin);
+
+        if(checkPoint(temp_bottomright)|| checkPoint(temp_bottomleft) || checkPoint(temp_topright) ||checkPoint(temp_topleft))
+        {
+            output = true;
+        }
+
+        if(output)
+        {
+            double width_ratio = (centerList[0].x() + 10.0 / scale_origin - centerList[1].x()) / (10.0 / scale_origin);
+            double height_ratio = (- centerList[0].y() + ratio * 10.0 / scale_origin + centerList[1].y()) / (ratio * 10.0 / scale_origin);
+            double temp_width = sourceImageVector[0].size().width();
+            double temp_height = sourceImageVector[0].size().height();
+            targetRect = QRect(QPoint(static_cast<int>(temp_width *(1.0 - width_ratio)), static_cast<int>(temp_height*(1.0 -height_ratio))), QPoint(static_cast<int>(temp_width), static_cast<int>(temp_height)));
+            sourceRect = QRect(QPoint(0, 0), QPoint(static_cast<int>(temp_width * width_ratio + 1), static_cast<int>(temp_height * height_ratio + 1)));
+        }
+
+        // image composition
+        this->temp_image = sourceImageVector[0].copy();
+        QPainter painter(&temp_image);
+        painter.setCompositionMode(mode);
+        painter.drawImage(sourceRect, this->destination_image, targetRect);
+        painter.end();
+        this->source_image = temp_image.copy();
+        output =  true;
+    }
+    return output;
+}
+
+void Composition::reloadImage()
+{
+    start_image = QPixmap::fromImage(source_image);
+    reference_image = QPixmap::fromImage(destination_image);
+    image_pixmap_origin->setPixmap(reference_image);
+    image_pixmap_reference->setPixmap(start_image);
 }
 
 void Composition::composeImage()
@@ -222,70 +298,71 @@ void Composition::composeImage()
         if(source_layer == "SourceOver")
         {
             ui->resultImage->moveLayer(ui->resultImage->layer("image_reference"),ui->resultImage->layer("image_origin"));
+            source_image = this->sourceImageVector[0].copy();
+            destination_image = this->sourceImageVector[1].copy();
+            reloadImage();
             ui->resultImage->replot();
         }
         else if (source_layer == "DestinationOver")
         {
             ui->resultImage->moveLayer(ui->resultImage->layer("image_origin"),ui->resultImage->layer("image_reference"));
+            source_image = this->sourceImageVector[0].copy();
+            destination_image = this->sourceImageVector[1].copy();
+            reloadImage();
             ui->resultImage->replot();
+        }
+        else
+        {
+            if(source_layer == "Xor") mode = QPainter::CompositionMode_Xor;
+            if(source_layer == "Darken") mode = QPainter::CompositionMode_Darken;
+            if(source_layer == "Lighten") mode = QPainter::CompositionMode_Lighten;
+            if(source_layer == "ColorDodge") mode = QPainter::CompositionMode_ColorDodge;
+            if(source_layer == "ColorBurn") mode = QPainter::CompositionMode_ColorBurn;
+            if(source_layer == "HardLight") mode = QPainter::CompositionMode_HardLight;
+            if(source_layer == "SoftLight") mode = QPainter::CompositionMode_SoftLight;
+            if(source_layer == "Difference") mode = QPainter::CompositionMode_Difference;
+
+            if(overlapfunction())
+            {
+                qDebug() << "overlap";
+                reloadImage();
+                ui->resultImage->replot();
+            }
+            else
+            {
+                qDebug() << "not overlap";
+            }
+
         }
     }
 }
 
 void Composition::scaleFunction(int arg)
 {
+
     QString selectImageStirng = ui->ShowLayer->text();
-    qDebug() << selectImageStirng;
     if(selectImageStirng == "Source")
     {
-        this->scale_reference = arg;
+        this->scale_reference = arg / 40.0 * 10.0;
+        double resize_ratio = scale_reference / 4.0;
+        int temp_width = static_cast<int>(this->source_image.size().width() * resize_ratio);
+        int temp_height = static_cast<int>(this->source_image.size().height() * resize_ratio);
+        this->source_image.scaled(temp_width, temp_height,Qt::KeepAspectRatio);
         imagerender();
     }
     else if(selectImageStirng == "Destination")
     {
-        this->scale_origin = arg;
+        this->scale_origin = arg / 40.0 * 10.0;
+        double resize_ratio = scale_reference / 4.0;
+        int temp_width = static_cast<int>(this->destination_image.size().width() * resize_ratio);
+        int temp_height = static_cast<int>(this->destination_image.size().height() * resize_ratio);
+        this->destination_image.scaled(temp_width, temp_height,Qt::KeepAspectRatio);
         imagerender();
     }
 }
 
-/*
-void Composition::alterImage()
+void Composition::resizeEvent(QResizeEvent *event)
 {
-    if(!this->sourceImageVector.isEmpty())
-    {
-        int mouseX = this->mousePosition.x();
-        int mouseY = this->mousePosition.y();
-        int image_width = sourceImageVector[0].width();
-        int image_height = sourceImageVector[0].height();
-        int delta_width, delta_height;
-        delta_width = static_cast<int>(image_width * 0.5 / 5.0);
-        delta_height = static_cast<int>(image_height * 0.5 / 5.0);
-
-        static const QSize imagesize(image_width, image_height);
-
-        this->temp_image = destination_image.copy();
-        QPainter painter(&temp_image);
-
-        QRect target(QPoint(mouseX - delta_width, mouseY - delta_height), QPoint(mouseX + delta_width, mouseY + delta_height));
-        QRect source(QPoint(mouseX - delta_width, mouseY - delta_height), QPoint(mouseX + delta_width, mouseY + delta_height));
-
-        painter.drawImage(target, source_image, source);
-        painter.end();
-        temp_image.scaled(ui->resultImage->width(), ui->resultImage->height(),Qt::KeepAspectRatio);
-        QPixmap result = QPixmap::fromImage(temp_image);
-        //set and get the image position
-        double topleft_x, topleft_y, bottomRight_x, bottomRight_y;
-        topleft_x = static_cast<double>(ui->resultImage->xAxis->pixelToCoord(mouseX - delta_width));
-        topleft_y = static_cast<double>(ui->resultImage->yAxis->pixelToCoord(mouseY - delta_height));
-        bottomRight_x = static_cast<double>(ui->resultImage->xAxis->pixelToCoord(mouseX + delta_width));
-        bottomRight_y = static_cast<double>(ui->resultImage->yAxis->pixelToCoord(mouseY + delta_height));
-        qDebug() << topleft_x << topleft_y << bottomRight_x << bottomRight_y << mouseX << mouseY;
-
-        image_pixmap_origin->setPixmap(result);
-        image_pixmap_origin->topLeft->setCoords(topleft_x, topleft_y);
-        image_pixmap_origin->bottomRight->setCoords(bottomRight_x, bottomRight_y);
-        ui->resultImage->replot();
-    }
+    qDebug() << event->size() << ratio;
+    imagerender();
 }
-
-*/

@@ -20,6 +20,8 @@ class Composition : public QWidget
 public:
     explicit Composition(QWidget *parent = nullptr);
     ~Composition();
+    void resizeEvent(QResizeEvent *);
+    void reloadImage();
 
 private slots:
     void on_loadImageButton_clicked();
@@ -30,6 +32,8 @@ private slots:
     void scaleFunction(int);
     // void alterImage();
     void imagerender();
+    bool overlapfunction();
+    bool checkPoint(QPointF);
 
 private:
     Ui::Composition *ui;
@@ -37,14 +41,19 @@ private:
     QCPItemRect* rect;
     QImage source_image, destination_image, temp_image;
     int destination_image_index;
-    QPointF mousePosition_new, mousePosition_old;
+    QPointF mousePosition_new, mousePosition_old, topRight_overlap_reference, bottomRight_overlap_reference,topRight_overlap_origin, bottomRight_overlap_origin;
     QCPItemPixmap *image_pixmap_origin, *image_pixmap_reference;
+    QPixmap start_image, reference_image;
     QVector<QPointF> centerList;
     bool tracking;
     int trackPoint;
     double scale_origin;
     double scale_reference;
     QString source_layer;
+    double ratio;
+    QRect targetRect, sourceRect;
+    QPainter::CompositionMode mode;
+    QString showlayerString;
 };
 
 #endif // COMPOSITION_H
