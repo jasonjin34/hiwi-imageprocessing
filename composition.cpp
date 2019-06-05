@@ -60,7 +60,8 @@ Composition::Composition(QWidget *parent) :
 
     xRectItem = new QCPItemRect(this->ui->resultImage);
     xRectItem->setVisible(false);
-    xRectItem->setPen(QPen(Qt::red));
+    xRectItem->setPen(QPen(Qt::black));
+    xRectItem->setBrush(QBrush(Qt::lightGray));
 }
 
 Composition::~Composition()
@@ -303,6 +304,7 @@ void Composition::composeImage()
         source_layer = ui->composition_type->currentText();
         if(source_layer == "SourceOver")
         {
+            xRectItem->setVisible(false);
             ui->resultImage->moveLayer(ui->resultImage->layer("image_reference"),ui->resultImage->layer("image_origin"));
             source_image = this->sourceImageVector[0].copy();
             destination_image = this->sourceImageVector[1].copy();
@@ -312,6 +314,7 @@ void Composition::composeImage()
         }
         else if (source_layer == "DestinationOver")
         {
+            xRectItem->setVisible(false);
             ui->resultImage->moveLayer(ui->resultImage->layer("image_origin"),ui->resultImage->layer("image_reference"));
             source_image = this->sourceImageVector[0].copy();
             destination_image = this->sourceImageVector[1].copy();
@@ -321,6 +324,13 @@ void Composition::composeImage()
         }
         else
         {
+            // show warning box if necessary
+            if (ui->ShowLayer->text() == "Source")
+            {
+                tracking = false;
+                QMessageBox::information(this, "Image Composition Error", "Please move the destination image");
+            }
+
             ui->resultImage->moveLayer(ui->resultImage->layer("image_reference"),ui->resultImage->layer("image_origin"));
             ui->LayerLabel->setText("Move Destination Layer");
             if(source_layer == "Xor") mode = QPainter::CompositionMode_Xor;
@@ -334,21 +344,17 @@ void Composition::composeImage()
 
             if(overlapfunction())
             {
-                qDebug() << "overlap";
+                //overlap case
                 reloadImage();
-                topleft_overlap_origin = QPointF(centerList[0].x() - 1.1 * 5.0 / scale_origin,  centerList[0].y() + 1.1 * ratio * 5.0 / scale_origin);
+                // the position of the top left point is changeable need to draw the rect base on the top left corner
+                topleft_overlap_origin = QPointF(centerList[0].x() - 1 * 5.0 / scale_origin,  centerList[0].y() +  ratio * 5.0 / scale_origin);
                 xRectItem->setVisible(true);
-                bottomRight_overlap_origin = QPointF(centerList[0].x() + 1.1 * 5.0 / scale_origin,  centerList[0].y() -  0.8 * ratio * 5.0 / scale_origin);
+                bottomRight_overlap_origin = QPointF(centerList[0].x() - 1.05 * 5.0 / scale_origin,  centerList[0].y() +  0.95 * ratio * 5.0 / scale_origin);
                 xRectItem->topLeft->setCoords(topleft_overlap_origin);
                 xRectItem->bottomRight->setCoords(bottomRight_overlap_origin);
                 ui->resultImage->replot();
-
             }
-            else
-            {
-                qDebug() << "not overlap";
-            }
-
+            // not overlap
         }
     }
 }
@@ -379,6 +385,16 @@ void Composition::scaleFunction(int arg)
 
 void Composition::resizeEvent(QResizeEvent *event)
 {
-    qDebug() << event->size() << ratio;
+    imagerender();
+    qDebug() << event->size();
+}
+
+void Composition::on_resetImage_clicked()
+{
+    ui->composition_type->setCurrentText("SourceOver");
+    ui->scaleValue->setValue(16);
+    this->source_image = this->sourceImageVector[0];
+    this->destination_image = this->sourceImageVector[1];
+    composeImage();
     imagerender();
 }

@@ -34,6 +34,7 @@ private slots:
     void imagerender();
     bool overlapfunction();
     bool checkPoint(QPointF);
+    void on_resetImage_clicked();
 
 private:
     Ui::Composition *ui;
