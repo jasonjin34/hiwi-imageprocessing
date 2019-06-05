@@ -57,6 +57,10 @@ Composition::Composition(QWidget *parent) :
     tracking = false;
     scale_origin = 4.0;
     scale_reference = 4.0;
+
+    xRectItem = new QCPItemRect(this->ui->resultImage);
+    xRectItem->setVisible(false);
+    xRectItem->setPen(QPen(Qt::red));
 }
 
 Composition::~Composition()
@@ -163,7 +167,7 @@ void Composition::mouseMove(QMouseEvent* event)
            x_temp = centerList[0].x() + mousePosition_x_diff;
            y_temp = centerList[0].y() + mousePosition_y_diff;
            centerList[0] = QPointF(x_temp, y_temp);
-
+           ui->ShowLayer->setText(showlayerString);
            imagerender();
        }
        else if(pointInReference && !intersection){
@@ -171,6 +175,7 @@ void Composition::mouseMove(QMouseEvent* event)
            x_temp = centerList[1].x() + mousePosition_x_diff;
            y_temp = centerList[1].y() + mousePosition_y_diff;
            centerList[1] = QPointF(x_temp, y_temp);
+           ui->ShowLayer->setText(showlayerString);
            imagerender();
        }
        else if(intersection)
@@ -181,6 +186,7 @@ void Composition::mouseMove(QMouseEvent* event)
                x_temp = centerList[1].x() + mousePosition_x_diff;
                y_temp = centerList[1].y() + mousePosition_y_diff;
                centerList[1] = QPointF(x_temp, y_temp);
+               ui->ShowLayer->setText(showlayerString);
                imagerender();
            }
            else {
@@ -188,6 +194,7 @@ void Composition::mouseMove(QMouseEvent* event)
                x_temp = centerList[0].x() + mousePosition_x_diff;
                y_temp = centerList[0].y() + mousePosition_y_diff;
                centerList[0] = QPointF(x_temp, y_temp);
+               ui->ShowLayer->setText(showlayerString);
                imagerender();
            }
        }
@@ -214,7 +221,6 @@ void Composition::mousePress(QMouseEvent * event)
 void Composition::mouseRelease(QMouseEvent* event)
 {
     tracking = false;
-    ui->ShowLayer->setText(showlayerString);
     event->accept();
 }
 
@@ -302,6 +308,7 @@ void Composition::composeImage()
             destination_image = this->sourceImageVector[1].copy();
             reloadImage();
             ui->resultImage->replot();
+            ui->LayerLabel->setText("Move Source Layer");
         }
         else if (source_layer == "DestinationOver")
         {
@@ -310,9 +317,12 @@ void Composition::composeImage()
             destination_image = this->sourceImageVector[1].copy();
             reloadImage();
             ui->resultImage->replot();
+            ui->LayerLabel->setText("Move Destination Layer");
         }
         else
         {
+            ui->resultImage->moveLayer(ui->resultImage->layer("image_reference"),ui->resultImage->layer("image_origin"));
+            ui->LayerLabel->setText("Move Destination Layer");
             if(source_layer == "Xor") mode = QPainter::CompositionMode_Xor;
             if(source_layer == "Darken") mode = QPainter::CompositionMode_Darken;
             if(source_layer == "Lighten") mode = QPainter::CompositionMode_Lighten;
@@ -326,7 +336,13 @@ void Composition::composeImage()
             {
                 qDebug() << "overlap";
                 reloadImage();
+                topleft_overlap_origin = QPointF(centerList[0].x() - 1.1 * 5.0 / scale_origin,  centerList[0].y() + 1.1 * ratio * 5.0 / scale_origin);
+                xRectItem->setVisible(true);
+                bottomRight_overlap_origin = QPointF(centerList[0].x() + 1.1 * 5.0 / scale_origin,  centerList[0].y() -  0.8 * ratio * 5.0 / scale_origin);
+                xRectItem->topLeft->setCoords(topleft_overlap_origin);
+                xRectItem->bottomRight->setCoords(bottomRight_overlap_origin);
                 ui->resultImage->replot();
+
             }
             else
             {

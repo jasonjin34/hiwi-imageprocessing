@@ -41,7 +41,7 @@ private:
     QCPItemRect* rect;
     QImage source_image, destination_image, temp_image;
     int destination_image_index;
-    QPointF mousePosition_new, mousePosition_old, topRight_overlap_reference, bottomRight_overlap_reference,topRight_overlap_origin, bottomRight_overlap_origin;
+    QPointF mousePosition_new, mousePosition_old, topRight_overlap_reference, bottomRight_overlap_reference,topleft_overlap_origin, bottomRight_overlap_origin;
     QCPItemPixmap *image_pixmap_origin, *image_pixmap_reference;
     QPixmap start_image, reference_image;
     QVector<QPointF> centerList;
@@ -54,6 +54,7 @@ private:
     QRect targetRect, sourceRect;
     QPainter::CompositionMode mode;
     QString showlayerString;
+    QCPItemRect * xRectItem;
 };
 
 #endif // COMPOSITION_H
